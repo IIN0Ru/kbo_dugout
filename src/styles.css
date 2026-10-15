@@ -1,8 +1,9 @@
 /* 글꼴은 외부(구글 폰트)에 기대지 않고 프로젝트에 포함한다.
-   자주 쓰는 한글 2,350자 + 영문으로 줄인 파일 (src/assets/fonts) */
+   자주 쓰는 한글 2,350자 + 영문으로 줄인 파일 (src/assets/fonts).
+   블랙한산스만 public/fonts에 둬서 index.html에서 미리 받는다(preload). 경로는 빌드 때 /kbo_dugout/이 붙는다. */
 @font-face {
   font-family: 'Black Han Sans';
-  src: url('./assets/fonts/BlackHanSans-Regular.woff2') format('woff2');
+  src: url('/fonts/BlackHanSans-Regular.woff2') format('woff2');
   font-weight: 400;
   font-display: block;
 }
@@ -25,9 +26,23 @@
   font-display: swap;
 }
 
-/* 레이아웃: 홈 유니폼 줄무늬 위, 왼쪽 위 로고 / 왼쪽 채팅방(티켓이 오른쪽 밖으로 돌출).
-   티켓 '입장'이 첫 화면의 유일한 버튼. */
+/* 레이아웃: 홈 유니폼 줄무늬 위, 왼쪽 위 로고 / 채팅방 + 오른쪽으로 튀어나온 티켓을 한 덩어리로 보고 화면 가운데.
+   티켓 '입장'이 첫 화면의 유일한 버튼.
+   크기는 단계(브레이크포인트) 없이 화면 폭에 따라 이어서 변한다. 숫자를 바꿀 땐 아래 '크기' 묶음만 고친다. */
 :root {
+  /* ---- 크기 (320px ~ 1920px에서 이어서 변함) ---- */
+  --gutter: clamp(16px, 2vw + 8px, 40px);          /* 화면 좌우 여백 */
+  --jut: clamp(28px, 18vw - 40px, 168px);          /* 티켓이 채팅방 밖으로 튀어나오는 길이 */
+  --room-max: clamp(360px, 22vw + 140px, 520px);   /* 채팅방 최대 폭 */
+  --room-w: min(100cqi - var(--jut), var(--room-max)); /* 채팅방 폭 (cqi = 본문 줄의 폭) */
+  --room-h: clamp(360px, 4vw + 320px, 420px);
+  --ticket-w: clamp(250px, var(--room-w) * 0.6 + var(--jut), 380px);
+  --stub-w: clamp(72px, 4vw + 60px, 96px);         /* 티켓 '입장' 꼬리 폭 */
+  --logo-size: clamp(22px, 1.4vw + 16px, 32px);
+  --logo-top: clamp(16px, 2vw, 32px);
+  --logo-left: clamp(16px, 3vw, 48px);
+
+  /* ---- 색 ---- */
   --cream: #fdfbf6;
   --red: #b3202a;
   --red-press: #96161f;
@@ -84,23 +99,23 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 .landing {
   min-height: 100vh;
   min-height: 100svh;
-  max-width: 960px;
-  margin-inline: auto;
-  padding-block: 88px 64px;
-  padding-left: max(24px, env(safe-area-inset-left, 0px));
-  padding-right: max(24px, env(safe-area-inset-right, 0px));
+  /* 로고 아래부터 본문이 시작되게 */
+  padding-top: calc(var(--logo-top) + var(--logo-size) + 40px);
+  padding-bottom: 48px;
+  padding-left: max(var(--gutter), env(safe-area-inset-left, 0px));
+  padding-right: max(var(--gutter), env(safe-area-inset-right, 0px));
   display: grid;
 }
 
-/* 로고는 가운데 정렬된 본문과 별개로 화면 왼쪽 가장자리에 붙인다 */
+/* 로고는 가운데 정렬된 본문과 별개로 화면 왼쪽 위에 둔다 */
 .logo {
   position: absolute;
-  top: 24px;
-  left: max(40px, env(safe-area-inset-left, 0px));
+  top: var(--logo-top);
+  left: max(var(--logo-left), env(safe-area-inset-left, 0px));
   margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: 26px;
+  font-size: var(--logo-size);
   line-height: 1;
   letter-spacing: 0.04em;
   color: var(--red);
@@ -108,23 +123,27 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
   padding: 4px 8px;
 }
 
+/* 본문 줄. 이 폭(100cqi)을 기준으로 채팅방 폭을 계산한다 */
 .landing__row {
   align-self: center;
+  width: 100%;
+  container-type: inline-size;
   display: flex;
-  align-items: flex-end;
-  justify-content: flex-start;
-  padding-block: 32px;
+  justify-content: center;
 }
 
+/* 오른쪽 여백(margin)만큼 티켓이 튀어나오므로, 채팅방 + 돌출을 합친 덩어리가 가운데에 온다.
+   휴대폰에서는 티켓 끝이 화면 여백선에 맞는다. */
 .landing__room {
-  flex: 0 1 420px;
-  min-width: 0;
+  flex: none;
+  width: var(--room-w);
+  margin-right: var(--jut);
 }
 
 /* ---------- 채팅방 ---------- */
 .room {
   position: relative;
-  height: 380px;
+  height: var(--room-h);
   display: flex;
   flex-direction: column;
   background: var(--paper);
@@ -179,6 +198,9 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
   font-weight: 500;
   font-size: 15px;
   line-height: 1.55;
+  /* 한글을 단어 단위로 줄바꿈 ("팬에 / 게," 방지) */
+  word-break: keep-all;
+  overflow-wrap: anywhere;
 }
 
 .bubble--typing {
@@ -225,8 +247,9 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 .room__ticket-shell {
   position: absolute;
   top: 8px;
-  right: -168px;
-  width: 352px;
+  /* 대화창 안쪽 여백(16px) + 테두리(3px)를 넘어 --jut 만큼 채팅방 밖으로 */
+  right: calc(-1 * (var(--jut) + 19px));
+  width: var(--ticket-w);
   transform: rotate(4deg);
   filter: drop-shadow(6px 6px 0 var(--ink));
 }
@@ -247,15 +270,16 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
   mask: radial-gradient(circle 9px at 0 50%, #0000 98%, #000);
   clip-path: polygon(0 0, 100% 0, 100% 6%, calc(100% - 3px) 12%, 100% 18%, calc(100% - 3px) 24%, 100% 30%, calc(100% - 3px) 36%, 100% 42%, calc(100% - 3px) 48%, 100% 54%, calc(100% - 3px) 60%, 100% 66%, calc(100% - 3px) 72%, 100% 78%, calc(100% - 3px) 84%, 100% 90%, calc(100% - 3px) 96%, 100% 100%, 0 100%);
 }
-.ticket__label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; color: var(--ticket-mute); }
+/* 위계: 내 선수와의 대화(제목, 노랑, 가장 큼) > 더그아웃 1:1석(좌석, 작게) > ADMIT ONE */
+.ticket__label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; color: var(--ticket-mute); }
 .ticket__seat,
-.ticket__title { font-family: var(--font-display); font-size: 21px; line-height: 1.25; }
-.ticket__seat { margin-top: 6px; }
-.ticket__title { color: var(--led); }
+.ticket__title { font-family: var(--font-display); line-height: 1.25; }
+.ticket__seat { margin-top: 6px; font-size: clamp(15px, 0.2vw + 14px, 16px); color: rgba(244, 242, 236, 0.85); }
+.ticket__title { margin-top: 2px; font-size: clamp(19px, 0.6vw + 15px, 26px); color: var(--led); }
 
 .ticket__stub {
   position: relative;
-  width: 86px;
+  width: var(--stub-w);
   margin-left: -1px;
   display: flex;
   align-items: center;
@@ -263,7 +287,7 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
   background: var(--red);
   color: var(--cream);
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: clamp(20px, 0.4vw + 18px, 24px);
   transform-origin: 0 100%;
   transition: transform 0.18s var(--ease-pop);
   -webkit-mask: radial-gradient(circle 9px at 100% 50%, #0000 98%, #000);
@@ -312,32 +336,6 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
   font-family: var(--font-display);
   font-size: 16px;
   animation: arrive 0.25s var(--ease-out) both;
-}
-
-/* ---------- 좁은 화면 ---------- */
-@media (max-width: 860px) {
-  .room__ticket-shell { right: -120px; width: 320px; }
-}
-
-@media (max-width: 719px) {
-  .landing {
-    padding-block: 64px 40px;
-    padding-left: max(16px, env(safe-area-inset-left, 0px));
-    padding-right: max(16px, env(safe-area-inset-right, 0px));
-  }
-  .logo { font-size: 22px; top: 16px; left: max(16px, env(safe-area-inset-left, 0px)); }
-  .landing__row {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 40px;
-    padding-block: 24px 0;
-  }
-  .landing__room { flex: none; margin-right: 28px; }
-  .room { height: 360px; }
-  .room__ticket { height: 96px; }
-  .room__ticket-shell { right: -44px; width: 288px; transform: rotate(3deg); }
-  .ticket__stub { width: 72px; font-size: 20px; }
-  .ticket__seat, .ticket__title { font-size: 19px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
