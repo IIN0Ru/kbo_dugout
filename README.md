@@ -11,6 +11,12 @@
   - 로그인(티켓 확인)·회원가입(티켓 발권) 화면은 다음 단계에서 react-router로 연결 예정. 지금은 안내 문구만 뜬다.
 - 문구·타이밍은 `src/landing.js`에서 고친다.
 
+## 사이트 주소
+
+https://iin0ru.github.io/kbo_dugout/
+
+main 브랜치에 올리면 GitHub Actions가 자동으로 다시 배포해요(1~2분). 진행 상황은 저장소의 Actions 탭에서 볼 수 있어요.
+
 ## 실행
 
 ```bash
