@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import Ticket from './Ticket.jsx'
 import { roomName, sender, introMessage, lockedReply, timeline } from '../landing.js'
 
-// 단계: 0 빈 방 → 1 입력 중 → 2 설명 메시지 → 3 입력 중 → 4 티켓 도착 → 5 입력 중(계속)
+// 단계: 0 빈 방 → 1 입력 중 → 2 설명 메시지 → 3 입력 중 → 4 티켓 도착 → 5 팬 쪽 입력 중(계속)
 // 열 때마다(새로고침 포함) 처음부터 재생. 움직임 줄이기 설정이면 바로 마지막 상태.
 const LAST = 5
 
@@ -30,9 +30,13 @@ function useIntroStep() {
   return step
 }
 
-function Typing() {
+// fan: 오른쪽 팬(나) 말풍선으로 표시. 기본은 왼쪽 DUGOUT 쪽
+function Typing({ fan = false }) {
   return (
-    <span className="bubble bubble--typing bubble--in" aria-hidden="true">
+    <span
+      className={`bubble bubble--typing bubble--in${fan ? ' bubble--out' : ''}`}
+      aria-hidden="true"
+    >
       <i />
       <i />
       <i />
@@ -75,7 +79,7 @@ export default function ChatRoom({ onEnter }) {
             </div>
           </div>
         )}
-        {typing && <Typing />}
+        {typing && <Typing fan={step === LAST} />}
       </div>
 
       <p className="room__locked">

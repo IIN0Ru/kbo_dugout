@@ -242,6 +242,13 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
   background: var(--text-mute);
   animation: typing 1s infinite;
 }
+/* 팬(나) 쪽 말풍선: 오른쪽, 빨강. 티켓을 받은 뒤 "내가 답장을 쓰는 중"으로 쓴다 */
+.bubble--out {
+  align-self: flex-end;
+  background: var(--red);
+  border-radius: 14px 2px 14px 14px;
+}
+.bubble--out.bubble--typing i { background: var(--cream); }
 .bubble--typing i:nth-child(2) { animation-delay: 0.15s; }
 .bubble--typing i:nth-child(3) { animation-delay: 0.3s; }
 @keyframes typing {
