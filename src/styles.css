@@ -68,6 +68,7 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 
 /* ---------- 바탕: 홈 유니폼 줄무늬 ---------- */
 .stage {
+  position: relative;
   min-height: 100vh;
   min-height: 100svh;
   overflow-x: clip;
@@ -85,15 +86,17 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
   min-height: 100svh;
   max-width: 960px;
   margin-inline: auto;
-  padding-block: 24px 64px;
+  padding-block: 88px 64px;
   padding-left: max(24px, env(safe-area-inset-left, 0px));
   padding-right: max(24px, env(safe-area-inset-right, 0px));
   display: grid;
-  grid-template-rows: auto 1fr;
 }
 
+/* 로고는 가운데 정렬된 본문과 별개로 화면 왼쪽 가장자리에 붙인다 */
 .logo {
-  justify-self: start;
+  position: absolute;
+  top: 24px;
+  left: max(40px, env(safe-area-inset-left, 0px));
   margin: 0;
   font-family: var(--font-display);
   font-weight: 400;
@@ -352,11 +355,11 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 
 @media (max-width: 719px) {
   .landing {
-    padding-block: 16px 40px;
+    padding-block: 64px 40px;
     padding-left: max(16px, env(safe-area-inset-left, 0px));
     padding-right: max(16px, env(safe-area-inset-right, 0px));
   }
-  .logo { font-size: 22px; }
+  .logo { font-size: 22px; top: 16px; left: max(16px, env(safe-area-inset-left, 0px)); }
   .landing__row {
     flex-direction: column;
     align-items: stretch;
