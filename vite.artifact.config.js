@@ -8,6 +8,8 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: 'dist-artifact',
+    // 글꼴을 CSS 안에 data URI로 넣어 공유 페이지 하나로 동작하게
+    assetsInlineLimit: 10 * 1024 * 1024,
     cssCodeSplit: false,
     rollupOptions: {
       input: 'src/main.jsx',

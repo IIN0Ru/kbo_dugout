@@ -1,3 +1,30 @@
+/* 글꼴은 외부(구글 폰트)에 기대지 않고 프로젝트에 포함한다.
+   자주 쓰는 한글 2,350자 + 영문으로 줄인 파일 (src/assets/fonts) */
+@font-face {
+  font-family: 'Black Han Sans';
+  src: url('./assets/fonts/BlackHanSans-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: block;
+}
+@font-face {
+  font-family: 'IBM Plex Sans KR';
+  src: url('./assets/fonts/IBMPlexSansKR-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Sans KR';
+  src: url('./assets/fonts/IBMPlexSansKR-Medium.woff2') format('woff2');
+  font-weight: 500 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  src: url('./assets/fonts/IBMPlexMono-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-display: swap;
+}
+
 /* 레이아웃: 홈 유니폼 줄무늬 위, 왼쪽 위 로고 / 왼쪽 채팅방(티켓이 오른쪽 밖으로 돌출) / 오른쪽 아래 '티켓 발권'.
    720px 미만에서는 채팅방 → 버튼 순으로 세로 배치. */
 :root {
