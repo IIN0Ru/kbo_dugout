@@ -25,8 +25,8 @@
   font-display: swap;
 }
 
-/* 레이아웃: 홈 유니폼 줄무늬 위, 왼쪽 위 로고 / 왼쪽 채팅방(티켓이 오른쪽 밖으로 돌출) / 오른쪽 아래 '티켓 발권'.
-   720px 미만에서는 채팅방 → 버튼 순으로 세로 배치. */
+/* 레이아웃: 홈 유니폼 줄무늬 위, 왼쪽 위 로고 / 왼쪽 채팅방(티켓이 오른쪽 밖으로 돌출).
+   티켓 '입장'이 첫 화면의 유일한 버튼. */
 :root {
   --cream: #fdfbf6;
   --red: #b3202a;
@@ -113,8 +113,6 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
   display: flex;
   align-items: flex-end;
   justify-content: flex-start;
-  /* 티켓이 튀어나오는 자리(약 170px)를 비워두고 바로 옆에 버튼 */
-  gap: 210px;
   padding-block: 32px;
 }
 
@@ -294,37 +292,6 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
   opacity: 0;
 }
 
-/* ---------- 티켓 발권 버튼 ---------- */
-.btn-issue {
-  position: relative;
-  flex: none;
-  min-height: 56px;
-  padding: 0 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--cream);
-  font-family: var(--font-display);
-  font-size: 22px;
-  line-height: 1;
-}
-/* 빨간 면에만 펀치 구멍을 내서 포커스 테두리는 잘리지 않게 */
-.btn-issue::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: var(--red);
-  -webkit-mask: radial-gradient(circle 9px at 0 50%, #0000 98%, #000) left / 51% 100% no-repeat,
-    radial-gradient(circle 9px at 100% 50%, #0000 98%, #000) right / 51% 100% no-repeat;
-  mask: radial-gradient(circle 9px at 0 50%, #0000 98%, #000) left / 51% 100% no-repeat,
-    radial-gradient(circle 9px at 100% 50%, #0000 98%, #000) right / 51% 100% no-repeat;
-  transition: background-color 0.15s;
-}
-.btn-issue span { position: relative; }
-.btn-issue:hover::before { background: var(--red-press); }
-.btn-issue:active { transform: translate(1px, 1px); }
-.btn-issue:focus-visible { outline: 3px solid var(--led); outline-offset: 4px; }
-
 /* ---------- 임시 안내 (다음 단계 화면이 생기면 삭제) ---------- */
 .notice {
   position: fixed;
@@ -350,7 +317,6 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 /* ---------- 좁은 화면 ---------- */
 @media (max-width: 860px) {
   .room__ticket-shell { right: -120px; width: 320px; }
-  .landing__row { gap: 150px; }
 }
 
 @media (max-width: 719px) {
@@ -372,12 +338,11 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
   .room__ticket-shell { right: -44px; width: 288px; transform: rotate(3deg); }
   .ticket__stub { width: 72px; font-size: 20px; }
   .ticket__seat, .ticket__title { font-size: 19px; }
-  .btn-issue { width: 100%; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .bubble--typing i { animation: none; }
   .bubble--in, .notice span { animation: none; }
-  .ticket__stub, .ticket__stub.is-torn, .btn-issue::before { transition: none; }
+  .ticket__stub, .ticket__stub.is-torn { transition: none; }
   .ticket__stub:hover, .ticket__stub:focus-visible { transform: none; }
 }

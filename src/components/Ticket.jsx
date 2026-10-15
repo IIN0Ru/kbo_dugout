@@ -42,7 +42,7 @@ export default function Ticket({ onEnter }) {
         type="button"
         className={`ticket__stub ${torn ? 'is-torn' : ''}`}
         onClick={enter}
-        aria-label="티켓을 뜯고 입장하기 (로그인)"
+        aria-label="티켓을 뜯고 입장하기 (로그인·회원가입)"
       >
         {ticket.stub}
       </button>
