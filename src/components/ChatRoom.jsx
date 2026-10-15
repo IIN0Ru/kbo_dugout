@@ -2,29 +2,13 @@ import { useEffect, useState } from 'react'
 import Ticket from './Ticket.jsx'
 import { roomName, introMessage, lockedReply, timeline } from '../landing.js'
 
-const SEEN_KEY = 'dugout:intro-seen'
-
-function readSeen() {
-  try {
-    return sessionStorage.getItem(SEEN_KEY) === '1'
-  } catch {
-    return false
-  }
-}
-function markSeen() {
-  try {
-    sessionStorage.setItem(SEEN_KEY, '1')
-  } catch {
-    /* 저장이 막힌 환경에서는 매번 연출을 보여준다 */
-  }
-}
-
 // 단계: 0 빈 방 → 1 입력 중 → 2 설명 메시지 → 3 입력 중 → 4 티켓 도착(정지)
+// 열 때마다(새로고침 포함) 처음부터 재생. 움직임 줄이기 설정이면 바로 완성 상태.
 function useIntroStep() {
   const [step, setStep] = useState(() => {
     if (typeof window === 'undefined') return 4
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    return reduce || readSeen() ? 4 : 0
+    return reduce ? 4 : 0
   })
 
   useEffect(() => {
@@ -33,10 +17,7 @@ function useIntroStep() {
       setTimeout(() => setStep(1), timeline.typing1),
       setTimeout(() => setStep(2), timeline.message),
       setTimeout(() => setStep(3), timeline.typing2),
-      setTimeout(() => {
-        setStep(4)
-        markSeen()
-      }, timeline.ticket),
+      setTimeout(() => setStep(4), timeline.ticket),
     ]
     return () => ids.forEach(clearTimeout)
     // 처음 한 번만 실행
