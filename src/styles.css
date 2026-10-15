@@ -35,7 +35,7 @@
   --jut: clamp(28px, 18vw - 40px, 168px);          /* 티켓이 채팅방 밖으로 튀어나오는 길이 */
   --room-max: clamp(360px, 22vw + 140px, 520px);   /* 채팅방 최대 폭 */
   --room-w: min(100cqi - var(--jut), var(--room-max)); /* 채팅방 폭 (cqi = 본문 줄의 폭) */
-  --room-h: clamp(360px, 4vw + 320px, 420px);
+  --room-h: 452px; /* 보낸 사람·메시지·티켓·입력 중이 320px 화면(메시지 3줄)에서도 들어가는 높이 */
   --ticket-w: clamp(250px, var(--room-w) * 0.6 + var(--jut), 380px);
   --stub-w: clamp(72px, 4vw + 60px, 96px);         /* 티켓 '입장' 꼬리 폭 */
   --logo-size: clamp(22px, 1.4vw + 16px, 32px);
@@ -183,9 +183,34 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  gap: 14px;
+  gap: 12px;
   padding: 16px;
 }
+/* 내용이 늘어나도 메시지·티켓 자리가 눌리지 않게 */
+.room__feed > * { flex-shrink: 0; }
+
+/* 보낸 사람: 첫 말풍선 바로 위 */
+.sender {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: -6px; /* 말풍선과 붙여서 한 묶음으로 */
+}
+.sender__avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 2px solid var(--ink);
+  color: var(--red);
+  font-family: var(--font-display);
+  font-size: 15px;
+  line-height: 1;
+}
+.sender__name { font-family: var(--font-display); font-size: 14px; letter-spacing: 0.04em; }
 
 .bubble {
   align-self: flex-start;
@@ -242,7 +267,7 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
 .room__lock { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; flex: none; }
 
 /* ---------- 티켓 (채팅방 오른쪽 밖으로 돌출) ---------- */
-.room__ticket { position: relative; height: 104px; }
+.room__ticket { position: relative; height: 124px; } /* 회전한 티켓 높이만큼 자리를 잡아 아래 '입력 중'과 겹치지 않게 */
 
 .room__ticket-shell {
   position: absolute;
