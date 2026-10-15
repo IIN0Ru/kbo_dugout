@@ -86,7 +86,9 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
   position: relative;
   min-height: 100vh;
   min-height: 100svh;
-  overflow-x: clip;
+  /* 찢어져 떨어지는 티켓 조각이 화면 밖으로 나가도 스크롤이 생기지 않게.
+     stage는 내용만큼 늘어나므로 평소 내용은 잘리지 않는다 */
+  overflow: clip;
   background-color: var(--cream);
   background-image: repeating-linear-gradient(
     90deg,
@@ -341,31 +343,9 @@ button { font: inherit; color: inherit; border: 0; background: none; padding: 0;
   opacity: 0;
 }
 
-/* ---------- 임시 안내 (다음 단계 화면이 생기면 삭제) ---------- */
-.notice {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: calc(24px + env(safe-area-inset-bottom, 0px));
-  margin: 0;
-  display: flex;
-  justify-content: center;
-  pointer-events: none;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-}
-.notice span {
-  background: var(--ink);
-  color: var(--led);
-  padding: 10px 16px;
-  font-family: var(--font-display);
-  font-size: 16px;
-  animation: arrive 0.25s var(--ease-out) both;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .bubble--typing i { animation: none; }
-  .bubble--in, .notice span { animation: none; }
+  .bubble--in { animation: none; }
   .ticket__stub, .ticket__stub.is-torn { transition: none; }
   .ticket__stub:hover, .ticket__stub:focus-visible { transform: none; }
 }
