@@ -1,20 +1,37 @@
-import ChatRoom from './components/ChatRoom.jsx'
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { SessionProvider, useSession } from './session.jsx'
+import Splash from './pages/Splash.jsx'
+import Login from './pages/Login.jsx'
+import Plan from './pages/Plan.jsx'
+import Home from './pages/Home.jsx'
+import Channel from './pages/Channel.jsx'
+import Bench from './pages/Bench.jsx'
 
-// 티켓 '입장'이 첫 화면의 유일한 버튼이다. 누르면 로그인/회원가입 화면으로 간다.
-// 그 화면은 다음 단계에서 react-router로 연결한다. 지금은 티켓만 찢어졌다가 다시 붙는다.
-const enter = () => {}
+function ErrorBar() {
+  const { error, store } = useSession()
+  if (error) return <div className="topnote err-note">{error}</div>
+  if (store?.mode === 'local')
+    return <div className="topnote">로컬 모드 · 이 브라우저 안에서만 데이터가 공유돼요</div>
+  return null
+}
 
 export default function App() {
   return (
-    <div className="stage">
-      <main className="landing">
-        <h1 className="logo">DUGOUT</h1>
-        <div className="landing__row">
-          <div className="landing__room">
-            <ChatRoom onEnter={enter} />
-          </div>
+    <SessionProvider>
+      <HashRouter>
+        <div className="app">
+          <ErrorBar />
+          <Routes>
+            <Route path="/" element={<Splash />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/plan" element={<Plan />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/channel/:playerId" element={<Channel />} />
+            <Route path="/bench" element={<Bench />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </div>
-      </main>
-    </div>
+      </HashRouter>
+    </SessionProvider>
   )
 }

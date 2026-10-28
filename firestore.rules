@@ -1,0 +1,41 @@
+rules_version = '2';
+// DUGOUT 시연용 Firestore 보안 규칙
+// - 청중: 익명 로그인. 선수 메시지·공개 픽은 읽기만, 답장은 '자기 것'만 쓰고 읽음
+// - 발표자: bench@dugout.app 계정으로 로그인. 메시지 발송, 모든 답장 읽기, ❤️·공개 픽
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function isBench() { return signedIn() && request.auth.token.email == 'bench@dugout.app'; }
+
+    match /users/{uid} {
+      allow read: if signedIn();
+      allow write: if signedIn() && request.auth.uid == uid
+        && request.resource.data.nickname is string
+        && request.resource.data.nickname.size() >= 2
+        && request.resource.data.nickname.size() <= 10;
+    }
+
+    match /messages/{id} {
+      allow read: if signedIn();
+      allow create: if isBench() && request.resource.data.text.size() <= 200;
+      allow update, delete: if isBench();
+    }
+
+    match /replies/{id} {
+      allow read: if isBench() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow create: if signedIn()
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 100
+        && request.resource.data.heart == false
+        && request.resource.data.picked == false;
+      allow update, delete: if isBench();
+    }
+
+    match /picks/{id} {
+      allow read: if signedIn();
+      allow write: if isBench();
+    }
+  }
+}
