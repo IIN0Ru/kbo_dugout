@@ -47,7 +47,7 @@ export default function Splash() {
 
       <div className="splash-pop">
         <div className="who">
-          <span className="av" style={{ background: color('lg') }}>7</span>외야수 #7 · 새 메시지
+          <span className="av av-logo" aria-hidden="true"><i /><i /><i /></span>DUGOUT · 공식 계정
         </div>
         <div className="bub">안녕하세요 DUGOUT입니다☺️</div>
         <span className="rcpt">구독한 팬 모두가 함께 받았어요</span>
