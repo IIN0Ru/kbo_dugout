@@ -49,7 +49,7 @@ export default function Splash() {
         <div className="who">
           <span className="av" style={{ background: color('lg') }}>7</span>외야수 #7 · 새 메시지
         </div>
-        <div className="bub">오늘 응원 소리 덕아웃까지 다 들렸어요. 내일도 잠실에서 봬요!</div>
+        <div className="bub">안녕하세요 DUGOUT입니다☺️</div>
         <span className="rcpt">구독한 팬 모두가 함께 받았어요</span>
       </div>
 
