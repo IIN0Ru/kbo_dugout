@@ -87,6 +87,9 @@ export const localStore = {
   subscribeMyReplies(userId, playerId, cb) {
     return watch((d) => d.replies.filter((r) => r.uid === userId && r.playerId === playerId), cb)
   },
+  subscribeAllReplies(cb) {
+    return watch((d) => d.replies, cb)
+  },
   subscribeRepliesForPlayer(playerId, cb) {
     return watch((d) => d.replies.filter((r) => r.playerId === playerId), cb)
   },

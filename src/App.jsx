@@ -29,6 +29,7 @@ export default function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/channel/:playerId" element={<Channel />} />
             <Route path="/bench" element={<Bench />} />
+            <Route path="/bench/:playerId" element={<Bench />} />
             <Route path="/me" element={<Me />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

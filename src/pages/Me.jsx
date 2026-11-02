@@ -63,7 +63,7 @@ export default function Me() {
   }
 
   return (
-    <main className="page lt me">
+    <main className="page lt mypage">
       <header className="lt-nav">
         <button className="lt-back" type="button" aria-label="뒤로" onClick={() => nav(-1)}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">

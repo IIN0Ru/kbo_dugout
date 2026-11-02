@@ -73,6 +73,9 @@ export const firebaseStore = {
       cb,
     )
   },
+  subscribeAllReplies(cb) {
+    return listen(collection(fs, 'replies'), cb)
+  },
   subscribeRepliesForPlayer(playerId, cb) {
     return listen(query(collection(fs, 'replies'), where('playerId', '==', playerId)), cb)
   },

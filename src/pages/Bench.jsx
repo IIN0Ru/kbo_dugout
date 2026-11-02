@@ -1,208 +1,330 @@
-import { useMemo, useState } from 'react'
-import { TEAMS, playersOfTeam, playerById, teamById, SEED_MESSAGES, RESTING } from '../data/teams.js'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { PLAYERS, playerById, teamById, SEED_MESSAGES, RESTING } from '../data/teams.js'
 import { useSession, useSub } from '../session.jsx'
-import { Logo, PlayerTile, TeamDot, timeLabel } from '../components/ui.jsx'
+import { Logo, PlayerTile, TeamDot, timeLabel, fmt } from '../components/ui.jsx'
 
-// 발표자용 선수 화면 (숨은 주소 #/bench). 외부에 공개하지 않는 시연용이라 로그인 없이 바로 쓴다.
-export default function Bench() {
-  return <BenchMain />
+// 발표자용 선수 화면 (숨은 주소 #/bench). 카카오톡처럼 채팅 목록 → 채팅방.
+// 외부에 공개하지 않는 시연용이라 로그인 없이 바로 쓴다.
+const SEEN_KEY = 'dugout-bench-seen'
+const readSeen = () => {
+  try {
+    return JSON.parse(localStorage.getItem(SEEN_KEY) || '{}')
+  } catch {
+    return {}
+  }
+}
+const writeSeen = (playerId, at) => {
+  try {
+    const s = readSeen()
+    s[playerId] = Math.max(s[playerId] || 0, at)
+    localStorage.setItem(SEEN_KEY, JSON.stringify(s))
+  } catch {
+    /* 무시 */
+  }
 }
 
-function BenchMain() {
+export default function Bench() {
+  const { playerId } = useParams()
+  return playerId && playerById(playerId) ? <Room playerId={playerId} /> : <ChatList />
+}
+
+/* ---------- 채팅 목록 ---------- */
+function ChatList() {
   const { store } = useSession()
-  const [playerId, setPlayerId] = useState('lg-7')
+  const nav = useNavigate()
+  const replies = useSub(store ? (cb) => store.subscribeAllReplies(cb) : null, [store], [])
+  const live = useSub(store ? (cb) => store.subscribeAllMessages(cb) : null, [store], [])
+  const [showAll, setShowAll] = useState(false)
+  const seen = readSeen()
+
+  const rooms = useMemo(() => {
+    const by = {}
+    for (const r of replies) {
+      if (r.blocked) continue
+      const g = (by[r.playerId] ||= { last: null, count: 0, unread: 0 })
+      g.count += 1
+      if (!g.last || g.last.createdAt < r.createdAt) g.last = r
+      if (!seen[r.playerId] || r.createdAt > seen[r.playerId]) g.unread += 1
+    }
+    return Object.entries(by)
+      .map(([id, g]) => ({ player: playerById(id), ...g }))
+      .filter((x) => x.player)
+      .sort((a, b) => b.last.createdAt - a.last.createdAt)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [replies])
+
+  const lastMsg = useMemo(() => {
+    const m = {}
+    for (const x of [...SEED_MESSAGES, ...live]) if (!m[x.playerId] || m[x.playerId].createdAt < x.createdAt) m[x.playerId] = x
+    return m
+  }, [live])
+
+  const quiet = PLAYERS.filter((p) => !rooms.some((r) => r.player.id === p.id))
+  const totalUnread = rooms.reduce((n, r) => n + r.unread, 0)
+
+  return (
+    <main className="page lt bk">
+      <header className="bk-top">
+        <Logo size={18} />
+        <span className="bench-tag">선수 화면 · 발표자</span>
+      </header>
+      <h1 className="bk-title">
+        채팅{totalUnread > 0 && <em>{totalUnread}</em>}
+      </h1>
+
+      {rooms.length === 0 && (
+        <div className="bk-empty">
+          <b>아직 팬 답장이 온 채팅방이 없어요</b>
+          <p>청중이 선수 메시지에 답장하면 여기에 채팅방이 생겨요.</p>
+        </div>
+      )}
+
+      <ul className="bk-list">
+        {rooms.map(({ player, last, count, unread }) => (
+          <li key={player.id}>
+            <button type="button" className="bk-row" onClick={() => nav(`/bench/${player.id}`)}>
+              <PlayerTile player={player} size={50} radius={19} />
+              <span className="bk-row-t">
+                <b>
+                  {player.label} <small>{teamById(player.teamId).short}</small>
+                  <i className="bk-n">{count}</i>
+                </b>
+                <span>
+                  {last.nickname}: {last.text}
+                </span>
+              </span>
+              <span className="bk-row-r">
+                <small>{timeLabel(last.createdAt)}</small>
+                {unread > 0 && <em>{unread > 99 ? '99+' : unread}</em>}
+              </span>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <button type="button" className="bk-more" onClick={() => setShowAll((v) => !v)}>
+        {showAll ? '답장 없는 선수 접기' : `답장 없는 선수 ${quiet.length}명 보기`}
+      </button>
+      {showAll && (
+        <ul className="bk-list bk-quiet">
+          {quiet.map((p) => (
+            <li key={p.id}>
+              <button type="button" className="bk-row" onClick={() => nav(`/bench/${p.id}`)}>
+                <PlayerTile player={p} size={44} radius={17} />
+                <span className="bk-row-t">
+                  <b>
+                    {p.label} <small>{teamById(p.teamId).short}</small>
+                  </b>
+                  <span>{RESTING[p.id] ? RESTING[p.id].note : lastMsg[p.id] ? `나: ${lastMsg[p.id].text}` : '보낸 메시지가 없어요'}</span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </main>
+  )
+}
+
+/* ---------- 채팅방 ---------- */
+function Room({ playerId }) {
+  const { store } = useSession()
+  const nav = useNavigate()
   const player = playerById(playerId)
   const team = teamById(player.teamId)
 
   const live = useSub(store ? (cb) => store.subscribeMessages(playerId, cb) : null, [store, playerId], [])
-  const replies = useSub(
-    store ? (cb) => store.subscribeRepliesForPlayer(playerId, cb) : null,
-    [store, playerId],
-    [],
-  )
+  const replies = useSub(store ? (cb) => store.subscribeRepliesForPlayer(playerId, cb) : null, [store, playerId], [])
+  const picks = useSub(store ? (cb) => store.subscribePicks(cb) : null, [store], [])
+  const fans = useSub(store ? (cb) => store.subscribeFanCount(cb) : null, [store], 0)
+
   const messages = useMemo(
-    () => [...SEED_MESSAGES.filter((m) => m.playerId === playerId), ...live].sort((a, b) => b.createdAt - a.createdAt),
+    () => [...SEED_MESSAGES.filter((m) => m.playerId === playerId), ...live].sort((a, b) => a.createdAt - b.createdAt),
     [live, playerId],
   )
-  const [msgId, setMsgId] = useState(null)
-  const current = messages.find((m) => m.id === msgId) || messages[0]
+  const msgById = useMemo(() => Object.fromEntries(messages.map((m) => [m.id, m])), [messages])
+  const myPicks = picks.filter((k) => k.playerId === playerId)
+  const blocked = replies.filter((r) => r.blocked)
+  const [showBlocked, setShowBlocked] = useState(false)
+
+  // 시간순으로 섞은 대화: 선수 메시지(오른쪽) · 팬 답장(왼쪽) · 공개 픽 대답(오른쪽)
+  const timeline = useMemo(() => {
+    const items = [
+      ...messages.map((m) => ({ kind: 'msg', at: m.createdAt, m })),
+      ...replies.filter((r) => !r.blocked || showBlocked).map((r) => ({ kind: 'reply', at: r.createdAt, r })),
+      ...myPicks.map((k) => ({ kind: 'pick', at: k.createdAt, k })),
+    ]
+    return items.sort((a, b) => a.at - b.at)
+  }, [messages, replies, myPicks, showBlocked])
 
   const [draft, setDraft] = useState('')
-  const [showBlocked, setShowBlocked] = useState(false)
-  const [picking, setPicking] = useState(null)
-  const [answer, setAnswer] = useState('')
+  const [target, setTarget] = useState(null) // 공개 픽으로 대답할 답장
+  const [busy, setBusy] = useState(false)
+  const endRef = useRef(null)
+  const inputRef = useRef(null)
 
-  const forMsg = replies.filter((r) => current && r.messageId === current.id).sort((a, b) => b.createdAt - a.createdAt)
-  const blocked = forMsg.filter((r) => r.blocked)
-  const visible = forMsg.filter((r) => !r.blocked)
+  useEffect(() => {
+    endRef.current?.scrollIntoView({ block: 'end' })
+  }, [timeline.length])
 
-  const send = async (e) => {
+  useEffect(() => {
+    const last = replies.reduce((t, r) => Math.max(t, r.createdAt), 0)
+    if (last) writeSeen(playerId, last)
+  }, [replies, playerId])
+
+  const submit = async (e) => {
     e.preventDefault()
     const t = draft.trim()
-    if (!t || !store) return
-    await store.sendMessage(playerId, t)
-    setDraft('')
-    setMsgId(null)
+    if (!t || !store || busy) return
+    setBusy(true)
+    try {
+      if (target) {
+        await store.pickReply(target, msgById[target.messageId] || { id: target.messageId, text: '' }, t)
+        setTarget(null)
+      } else {
+        await store.sendMessage(playerId, t)
+      }
+      setDraft('')
+    } catch (err) {
+      console.error(err)
+    } finally {
+      setBusy(false)
+    }
   }
 
+  let lastDay = ''
   return (
-    <main className="page bench" style={{ '--tc': team.color }}>
-      <header className="topbar">
-        <Logo />
-        <span className="bench-tag">선수 화면 · 발표자</span>
+    <main className="page lt bk-room" style={{ '--tc': team.color }}>
+      <header className="chw-top bk-room-top">
+        <button className="lt-back" type="button" aria-label="채팅 목록" onClick={() => nav('/bench')}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <path d="M15 5l-7 7 7 7" />
+          </svg>
+        </button>
+        <span className="chw-num">#{player.no}</span>
+        <span className="chw-title">
+          <b>
+            {player.pos} · {team.name}
+          </b>
+          <small>
+            구독 팬 {fmt(fans)}명{RESTING[playerId] ? ' · 쉬는 중' : ''}
+          </small>
+        </span>
       </header>
 
-      <section className="bench-sec">
-        <label className="field">
-          <span>어떤 선수로 보낼까요?</span>
-          <select
-            id="bench-player"
-            value={playerId}
-            onChange={(e) => {
-              setPlayerId(e.target.value)
-              setMsgId(null)
-              setPicking(null)
-            }}
-          >
-            {TEAMS.map((t) => (
-              <optgroup key={t.id} label={t.name}>
-                {playersOfTeam(t.id).map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.label}
-                    {RESTING[p.id] ? ' (쉬는 중)' : ''}
-                  </option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
-        </label>
-
-        <form className="bench-compose" onSubmit={send}>
-          <div className="who">
-            <PlayerTile player={player} size={30} radius={9} />
-            {player.label} · {team.name}
-          </div>
-          <textarea
-            id="bench-draft"
-            rows={3}
-            maxLength={200}
-            value={draft}
-            onChange={(e) => setDraft(e.target.value)}
-            placeholder="구독한 팬 모두에게 보낼 메시지"
-          />
-          <div className="row-end">
-            <small className="muted">
-              {RESTING[playerId] ? '쉬는 중인 선수예요. 팬 화면엔 경기 기록 카드만 보여요' : '특정 팬 한 명에게만 보내는 기능은 없어요'}
-            </small>
-            <button className="btn btn-led btn-sm" type="submit" disabled={!draft.trim()}>
-              모두에게 보내기
-            </button>
-          </div>
-        </form>
-      </section>
-
-      <section className="bench-sec">
-        <h2 className="h-sm">팬 답장</h2>
-        {messages.length > 0 ? (
-          <label className="field">
-            <span>어떤 메시지의 답장을 볼까요?</span>
-            <select id="bench-msg" value={current?.id} onChange={(e) => setMsgId(e.target.value)}>
-              {messages.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {timeLabel(m.createdAt)} · {m.text.slice(0, 28)}
-                  {m.text.length > 28 ? '…' : ''}
-                </option>
-              ))}
-            </select>
-          </label>
-        ) : (
-          <p className="muted">아직 보낸 메시지가 없어요.</p>
+      <div className="bk-thread">
+        {blocked.length > 0 && (
+          <button type="button" className="bk-sys" onClick={() => setShowBlocked((v) => !v)}>
+            금칙어로 숨긴 답장 {blocked.length}개 · {showBlocked ? '숨기기' : '보기'}
+          </button>
         )}
+        {timeline.length === 0 && <p className="bk-sys">아직 대화가 없어요. 아래에서 첫 메시지를 보내 보세요.</p>}
 
-        {current && (
-          <>
-            <div className="bench-stats">
-              <span>
-                답장 <b>{visible.length}</b>
-              </span>
-              <button type="button" className="link" onClick={() => setShowBlocked((v) => !v)}>
-                금칙어로 숨긴 답장 {blocked.length}개 {showBlocked ? '접기' : '보기'}
-              </button>
-            </div>
-
-            {visible.length === 0 && <p className="muted pad-s">아직 답장이 없어요. 청중에게 답장을 부탁해 보세요!</p>}
-
-            <ul className="reply-list">
-              {visible.map((r) => (
-                <li key={r.id} className={r.picked ? 'picked' : ''}>
-                  <div className="r-head">
-                    <TeamDot teamId={r.team} />
-                    <b>{r.nickname}</b>
+        {timeline.map((it) => {
+          const d = new Date(it.at)
+          const day = `${d.getMonth() + 1}월 ${d.getDate()}일`
+          const sep = day !== lastDay ? <p className="bk-day">{day}</p> : null
+          lastDay = day
+          if (it.kind === 'msg')
+            return (
+              <div key={it.m.id}>
+                {sep}
+                <div className="bk-me">
+                  <small>
+                    <span>모두에게</span>
+                    {timeLabel(it.m.createdAt)}
+                  </small>
+                  <div className="bk-bub me">{it.m.text}</div>
+                </div>
+              </div>
+            )
+          if (it.kind === 'pick')
+            return (
+              <div key={it.k.id}>
+                {sep}
+                <div className="bk-me">
+                  <small>
+                    <span className="led">공개 픽</span>
+                    {timeLabel(it.k.createdAt)}
+                  </small>
+                  <div className="bk-bub me">
+                    <span className="bk-quote">
+                      {it.k.nickname}: {it.k.replyText}
+                    </span>
+                    {it.k.answer}
+                  </div>
+                </div>
+              </div>
+            )
+          const r = it.r
+          return (
+            <div key={r.id}>
+              {sep}
+              <div className={`bk-fan ${r.blocked ? 'blocked' : ''} ${target?.id === r.id ? 'target' : ''}`}>
+                <span className="bk-av">{r.team ? <img src={`logos/${r.team}.jpg`} alt="" /> : <TeamDot teamId={r.team} />}</span>
+                <div>
+                  <b className="bk-nick">{r.nickname}</b>
+                  <div className="bk-line">
+                    <div className="bk-bub fan">{r.text}</div>
                     <small>{timeLabel(r.createdAt)}</small>
                   </div>
-                  <p>{r.text}</p>
-                  <div className="r-actions">
-                    <button
-                      type="button"
-                      className={`chip ${r.heart ? 'on' : ''}`}
-                      onClick={() => store.setHeart(r.id, !r.heart)}
-                    >
-                      {r.heart ? '❤️ 반응함' : '🤍 반응'}
-                    </button>
-                    {r.picked ? (
-                      <span className="chip on-led">공개 픽 완료</span>
-                    ) : (
-                      <button type="button" className="chip" onClick={() => setPicking(r.id)}>
-                        공개 픽
+                  {!r.blocked && (
+                    <div className="bk-acts">
+                      <button type="button" className={r.heart ? 'on' : ''} onClick={() => store?.setHeart(r.id, !r.heart)}>
+                        {r.heart ? '❤️' : '🤍'}
                       </button>
-                    )}
-                  </div>
-                  {picking === r.id && (
-                    <form
-                      className="pick-form"
-                      onSubmit={async (e) => {
-                        e.preventDefault()
-                        if (!answer.trim()) return
-                        await store.pickReply(r, current, answer.trim())
-                        setPicking(null)
-                        setAnswer('')
-                      }}
-                    >
-                      <textarea
-                        id={`answer-${r.id}`}
-                        rows={2}
-                        maxLength={200}
-                        value={answer}
-                        onChange={(e) => setAnswer(e.target.value)}
-                        placeholder="이 답장에 모두가 볼 대답을 적어 주세요"
-                      />
-                      <div className="row-end">
-                        <button type="button" className="link" onClick={() => setPicking(null)}>
-                          취소
+                      {r.picked ? (
+                        <span className="picked">공개 픽 완료</span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTarget(r)
+                            inputRef.current?.focus()
+                          }}
+                        >
+                          공개 픽으로 대답
                         </button>
-                        <button className="btn btn-led btn-sm" type="submit" disabled={!answer.trim()}>
-                          모두에게 공개
-                        </button>
-                      </div>
-                    </form>
-                  )}
-                </li>
-              ))}
-              {showBlocked &&
-                blocked.map((r) => (
-                  <li key={r.id} className="blocked">
-                    <div className="r-head">
-                      <TeamDot teamId={r.team} />
-                      <b>{r.nickname}</b>
-                      <small>숨김 · 금칙어</small>
+                      )}
                     </div>
-                    <p>{r.text}</p>
-                  </li>
-                ))}
-            </ul>
-          </>
+                  )}
+                </div>
+              </div>
+            </div>
+          )
+        })}
+        <div ref={endRef} />
+      </div>
+
+      <form className="bk-compose" onSubmit={submit}>
+        {target && (
+          <div className="bk-target">
+            <span>
+              <b>{target.nickname}</b> 님 답장에 공개 대답 · 모두에게 공개돼요
+              <small>{target.text}</small>
+            </span>
+            <button type="button" aria-label="공개 픽 취소" onClick={() => setTarget(null)}>
+              ×
+            </button>
+          </div>
         )}
-      </section>
+        <div className="bk-in">
+          <input
+            ref={inputRef}
+            id="bench-draft"
+            value={draft}
+            maxLength={200}
+            autoComplete="off"
+            enterKeyHint="send"
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder={target ? '모두가 볼 대답을 적어 주세요' : '구독한 팬 모두에게 보내기'}
+          />
+          <button className="bk-send" type="submit" disabled={!draft.trim() || busy}>
+            {target ? '공개' : '전송'}
+          </button>
+        </div>
+      </form>
     </main>
   )
 }
