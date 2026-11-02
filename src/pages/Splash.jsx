@@ -8,12 +8,12 @@ import { useSession } from '../session.jsx'
 const TILES = [
   { team: 'lg', no: 7, badge: 3, photo: null },
   { team: 'doosan', no: 17, badge: 1, photo: null },
-  { team: 'hanwha', no: 1, badge: 0, photo: null },
+  { team: 'kia', no: 54, badge: 1, photo: 'backs/kia-54.jpg' },
   { team: 'nc', no: 52, badge: 0, photo: null },
   { team: 'kt', no: 10, badge: 2, photo: null },
   { team: 'samsung', no: 24, badge: 0, photo: null },
   { team: 'kiwoom', no: 33, badge: 0, photo: null },
-  { team: 'kia', no: 5, badge: 1, photo: null },
+  { team: 'hanwha', no: 1, badge: 0, photo: null },
   { team: 'lotte', no: 9, badge: 0, photo: null },
 ]
 
