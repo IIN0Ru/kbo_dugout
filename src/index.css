@@ -261,3 +261,28 @@ textarea { resize: vertical; line-height: 1.5; }
 .join-team.on { border: 2px solid #111; box-shadow: 0 6px 16px -8px rgba(0,0,0,.35); }
 .join-team.on span { font-weight: 700; }
 .join-team.on::after { content: '✓'; position: absolute; right: 8px; top: 8px; width: 24px; height: 24px; border-radius: 50%; background: var(--led); color: #111; font: 800 13px/24px var(--f-body); text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+
+/* ===== 구독 플랜 (흰 바탕, 시안 B) ===== */
+.pl { min-height: 100dvh; display: flex; flex-direction: column; }
+.pl-body { flex: 1; display: flex; flex-direction: column; padding: 0 20px; }
+.pl-head { text-align: center; display: grid; justify-items: center; gap: 8px; padding-top: 20px; }
+.pl-logo { width: 72px; height: 38px; border-radius: 8px; object-fit: cover; }
+.pl-head h1 { margin: 4px 0 0; font: 700 28px/1.2 var(--f-body); letter-spacing: -0.04em; }
+.pl-head p { margin: 0; font-size: 14px; color: #6e6e73; }
+.pl-seg { margin-top: 22px; background: #f2f2f4; border-radius: 12px; padding: 3px; display: grid; grid-template-columns: 1fr 1fr; }
+.pl-seg button { border: 0; background: none; padding: 11px 0; border-radius: 10px; font: 600 14px/1 var(--f-body); color: #6e6e73; transition: background .15s; }
+.pl-seg button.on { background: #fff; color: #111; box-shadow: 0 1px 4px rgba(0,0,0,.12); }
+.pl-price { text-align: center; margin-top: 22px; }
+.pl-price b { font: 700 46px/1 'Inter', 'Helvetica Neue', Arial, sans-serif; letter-spacing: -0.03em; }
+.pl-price small { display: block; margin-top: 8px; font-size: 13px; color: #6e6e73; }
+.pl-table { margin-top: 22px; width: 100%; border-collapse: collapse; font-size: 14px; }
+.pl-table th { font-size: 12px; font-weight: 600; color: #a1a1a6; padding: 6px 0; width: 64px; }
+.pl-table th:first-child { width: auto; }
+.pl-table th.on { color: #111; }
+.pl-table td { border-top: 1px solid #ececec; padding: 12px 0; text-align: center; }
+.pl-table td:first-child { text-align: left; }
+.pl-table .y { color: #c7c7cc; font-weight: 700; }
+.pl-table td.on .y { color: #0071e3; }
+.pl-table .n { color: #d1d1d6; }
+.pl .lt-cta { display: grid; gap: 8px; }
+.pl-tiny { text-align: center; font-size: 11.5px; color: #8a8a8a; }
