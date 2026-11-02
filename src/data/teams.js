@@ -59,3 +59,18 @@ export const RESTING = {
   'samsung-2': { note: '부상 회복 중 · 메시지 쉬는 중', card: '최근 5경기 · 타율 .312 · 2홈런' },
   'nc-47': { note: '선발 등판 준비 · 메시지 쉬는 중', card: '최근 등판 · 6이닝 2실점 7탈삼진' },
 }
+
+// 구단 공식 채널 (2026.11 웹 검색으로 확인한 주소). 확인하지 못한 채널은 비워 두면 버튼이 안 보인다.
+// news: 구단 뉴스 페이지. 정확한 뉴스 주소를 확인하지 못해 공식 홈페이지로 연결한다.
+export const TEAM_LINKS = {
+  lg: { home: 'https://www.lgtwins.com', instagram: 'https://www.instagram.com/lgtwinsbaseballclub/', x: 'https://x.com/LGTWINS_SEOUL', youtube: 'https://www.youtube.com/c/lgtwinstv' },
+  hanwha: { home: 'https://www.hanwhaeagles.co.kr', instagram: 'https://www.instagram.com/gohanwhaeagles/', youtube: 'https://www.youtube.com/@HanwhaEagles_official' },
+  ssg: { home: 'https://www.ssglanders.com', instagram: 'https://www.instagram.com/ssglanders.incheon/', x: 'https://x.com/twittlanders', youtube: 'https://www.youtube.com/@SSGLANDERS' },
+  samsung: { home: 'https://www.samsunglions.com', instagram: 'https://www.instagram.com/samsunglions_baseballclub/', x: 'https://x.com/twittlions', youtube: 'https://www.youtube.com/@lionstv1982' },
+  nc: { home: 'https://www.ncdinos.com', instagram: 'https://www.instagram.com/ncdinos2011/', x: 'https://x.com/NCdinos_fan', youtube: 'https://www.youtube.com/@ncdinos' },
+  kt: { home: 'https://www.ktwiz.co.kr', instagram: 'https://www.instagram.com/ktwiz.pr/', x: 'https://x.com/wiz_kt', youtube: 'https://www.youtube.com/c/ktwiztv' },
+  lotte: { home: 'https://www.giantsclub.com', instagram: 'https://www.instagram.com/busanlottegiants/', x: 'https://x.com/lottegiantskbo', youtube: 'https://www.youtube.com/channel/UCAZQZdSY5_YrziMPqXi-Zfw' },
+  kia: { home: 'https://tigers.co.kr', instagram: 'https://www.instagram.com/always_kia_tigers/', x: 'https://x.com/Kiatigers', youtube: 'https://www.youtube.com/@kiatigerstv' },
+  doosan: { home: 'https://www.doosanbears.com', instagram: 'https://www.instagram.com/doosanbears.1982/', x: 'https://x.com/doosanbears1982' },
+  kiwoom: { home: 'https://www.heroesbaseball.co.kr', instagram: 'https://www.instagram.com/heroesbaseballclub/', youtube: 'https://www.youtube.com/@heroesbaseballclub' },
+}

@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { TEAMS, PLAYERS, SEED_MESSAGES, RESTING, playersOfTeam, teamById } from '../data/teams.js'
+import { SEED_MESSAGES, RESTING, TEAM_LINKS, playersOfTeam, teamById } from '../data/teams.js'
 import { useSession, useSub } from '../session.jsx'
-import { Logo, PlayerTile, timeLabel } from '../components/ui.jsx'
+import { PlayerTile, timeLabel } from '../components/ui.jsx'
 import Picks from './Picks.jsx'
 
 export function readSeen() {
@@ -13,6 +13,31 @@ export function readSeen() {
   }
 }
 
+const CHANNELS = [
+  ['home', '홈페이지', <path key="h" d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" />],
+  ['instagram', '인스타그램', <g key="i"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="1" fill="currentColor" /></g>],
+  ['x', 'X', <path key="x" d="M4 4l16 16M20 4L4 20" />],
+  ['youtube', '유튜브', <g key="y"><rect x="2.5" y="5" width="19" height="14" rx="4" /><path d="M10 9l5 3-5 3z" fill="currentColor" /></g>],
+]
+
+function TopRow({ team, nickname }) {
+  return (
+    <header className="lt-nav hm-top">
+      <span className="lt-bars" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </span>
+      <span className="hm-me">
+        <img src={`logos/${team.id}.jpg`} alt="" />
+        {nickname}
+      </span>
+    </header>
+  )
+}
+
+// 홈 (흰 바탕, 확정 시안 E 변형)
+// 인사말 → 검정 카드(내 구단 공식 채널·소식) → 내 구단 선수 메시지. 다른 구단은 보여 주지 않는다.
 export default function Home() {
   const { store, profile } = useSession()
   const nav = useNavigate()
@@ -31,8 +56,8 @@ export default function Home() {
 
   if (!profile) {
     return (
-      <main className="page center">
-        <p>먼저 입장권을 만들어 주세요.</p>
+      <main className="page lt center">
+        <p>먼저 닉네임과 응원 구단을 정해 주세요.</p>
         <button className="btn btn-led" type="button" onClick={() => nav('/login')}>
           로그인하기
         </button>
@@ -40,85 +65,98 @@ export default function Home() {
     )
   }
 
-  const myTeam = teamById(profile.team)
-  const others = TEAMS.filter((t) => t.id !== profile.team)
+  const team = teamById(profile.team)
+  const links = TEAM_LINKS[team.id] || {}
 
-  const Row = ({ p }) => {
-    const m = latest[p.id]
-    const rest = RESTING[p.id]
-    const unread = m && (!seen[p.id] || seen[p.id] < m.createdAt)
+  if (tab === 'picks') {
     return (
-      <Link to={`/channel/${p.id}`} className="prow">
-        <PlayerTile player={p} />
-        <span className="prow-text">
-          <b>
-            {p.label}
-            {unread && <i className="unread" aria-label="새 메시지" />}
-          </b>
-          <small>{rest ? rest.note : m ? m.text : '아직 메시지가 없어요'}</small>
-        </span>
-        <span className="prow-time">{m ? timeLabel(m.createdAt) : ''}</span>
-      </Link>
+      <main className="page lt hm">
+        <TopRow team={team} nickname={profile.nickname} />
+        <div className="hm-subhead">
+          <button type="button" className="hm-back" onClick={() => setParams({})}>
+            ← 선수 메시지
+          </button>
+          <h1>공개 픽</h1>
+          <p>선수가 고른 팬 답장과 선수의 대답을 모두가 함께 봐요.</p>
+        </div>
+        <Picks />
+      </main>
     )
   }
 
+  const players = playersOfTeam(team.id)
+  const isUnread = (p) => {
+    const m = latest[p.id]
+    return m && !RESTING[p.id] && (!seen[p.id] || seen[p.id] < m.createdAt)
+  }
+  const unread = players.filter(isUnread).length
+
   return (
-    <main className="page home">
-      <header className="topbar">
-        <Logo />
-        <span className="me-chip" style={{ '--tc': myTeam.color }}>
-          <i />
-          {profile.nickname}
-        </span>
-      </header>
+    <main className="page lt hm">
+      <TopRow team={team} nickname={profile.nickname} />
 
-      <nav className="tabs" role="tablist">
-        <button
-          role="tab"
-          aria-selected={tab === 'players'}
-          className={tab === 'players' ? 'on' : ''}
-          onClick={() => setParams({})}
-        >
-          선수
-        </button>
-        <button
-          role="tab"
-          aria-selected={tab === 'picks'}
-          className={tab === 'picks' ? 'on' : ''}
-          onClick={() => setParams({ tab: 'picks' })}
-        >
-          공개 픽
-        </button>
-      </nav>
+      <h1 className="hm-hello">
+        {profile.nickname}님,
+        <br />
+        {unread ? '덕아웃에 새 소식이 있어요' : '오늘도 덕아웃에 오셨네요'}
+      </h1>
 
-      {tab === 'players' ? (
-        <div className="players">
-          <section>
-            <h2 className="sec" style={{ '--tc': myTeam.color }}>
-              <i />내 구단 · {myTeam.name}
-            </h2>
-            {playersOfTeam(myTeam.id).map((p) => (
-              <Row key={p.id} p={p} />
-            ))}
-          </section>
-          {others.map((t) => (
-            <section key={t.id}>
-              <h2 className="sec" style={{ '--tc': t.color }}>
-                <i />
-                {t.name}
-              </h2>
-              {playersOfTeam(t.id).map((p) => (
-                <Row key={p.id} p={p} />
-              ))}
-            </section>
-          ))}
-          <p className="tiny muted pad">
-            선수는 실명 없이 포지션과 등번호로만 표시해요. 총 {PLAYERS.length}명의 가상 선수예요.
-          </p>
+      <section className="hm-card" aria-label={`${team.name} 공식 채널`}>
+        <div className="hm-card-h">
+          <img src={`logos/${team.id}.jpg`} alt="" />
+          <b>{team.name}</b>
+          <small>공식 채널</small>
         </div>
-      ) : (
-        <Picks />
-      )}
+        <div className="hm-ch">
+          {CHANNELS.filter(([k]) => links[k]).map(([k, label, icon]) => (
+            <a key={k} href={links[k]} target="_blank" rel="noreferrer">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                {icon}
+              </svg>
+              {label}
+            </a>
+          ))}
+        </div>
+        {links.home && (
+          <a className="hm-news" href={links.home} target="_blank" rel="noreferrer">
+            <span>
+              <b>최신 소식</b>
+              <small>구단 홈페이지에서 공지·뉴스 보기</small>
+            </span>
+            <i aria-hidden="true">↗</i>
+          </a>
+        )}
+      </section>
+
+      <div className="hm-sec">
+        <h2>
+          선수 메시지{unread > 0 && <em>{unread}</em>}
+        </h2>
+        <button type="button" onClick={() => setParams({ tab: 'picks' })}>
+          공개 픽 →
+        </button>
+      </div>
+
+      <div className="hm-list">
+        {players.map((p) => {
+          const m = latest[p.id]
+          const rest = RESTING[p.id]
+          return (
+            <Link key={p.id} to={`/channel/${p.id}`} className={`hm-row ${rest ? 'rest' : ''}`}>
+              <PlayerTile player={p} size={46} radius={23} />
+              <span className="hm-row-t">
+                <b>
+                  {p.label}
+                  {isUnread(p) && <i className="hm-dot" aria-label="새 메시지" />}
+                </b>
+                <small>{rest ? rest.note : m ? m.text : '아직 메시지가 없어요'}</small>
+              </span>
+              <span className="hm-row-time">{m && !rest ? timeLabel(m.createdAt) : ''}</span>
+            </Link>
+          )
+        })}
+      </div>
+      <p className="hm-foot">선수는 실명 없이 포지션과 등번호로만 표시한 가상 인물이에요.</p>
     </main>
   )
 }
