@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { TEAMS } from '../data/teams.js'
 import { useSession } from '../session.jsx'
-import { TopBar } from '../components/ui.jsx'
 import { isBlocked } from '../data/filter.js'
 
+// 입장 화면 (흰 바탕)
+// A(Nike)의 큰 제목·알약 입력 + D(Uber)의 상단 진행 막대 + B(Airbnb)의 구단 카드(로고)
 export default function Login() {
   const nav = useNavigate()
   const { saveProfile, profile, store } = useSession()
@@ -32,14 +33,37 @@ export default function Login() {
   }
 
   return (
-    <main className="page">
-      <TopBar />
-      <form className="login" onSubmit={submit}>
-        <h1>덕아웃 입장권을 만들어요</h1>
-        <p className="muted">닉네임과 응원 구단만 있으면 돼요. 다른 개인정보는 받지 않아요.</p>
+    <main className="page lt join">
+      <header className="lt-nav">
+        <button className="lt-back" type="button" aria-label="뒤로" onClick={() => nav(-1)}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <path d="M15 5l-7 7 7 7" />
+          </svg>
+        </button>
+        <span className="lt-bars" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </span>
+        <span className="lt-back" aria-hidden="true" />
+      </header>
+      <div className="lt-steps" aria-label="2단계 중 1단계">
+        <i className="on" />
+        <i />
+      </div>
 
-        <label className="field">
-          <span>닉네임</span>
+      <form className="join-form" onSubmit={submit}>
+        <h1 className="join-title">
+          Join the
+          <br />
+          Dugout
+        </h1>
+        <p className="join-sub">닉네임과 응원 구단만 있으면 돼요.</p>
+
+        <label className="join-label" htmlFor="nickname">
+          닉네임
+        </label>
+        <div className="join-pill">
           <input
             id="nickname"
             value={nickname}
@@ -51,29 +75,30 @@ export default function Login() {
               setErr('')
             }}
           />
-        </label>
+          <small>{name.length}/10</small>
+        </div>
 
-        <fieldset className="field">
-          <legend>응원 구단</legend>
-          <div className="team-grid">
-            {TEAMS.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                className={`team-chip ${team === t.id ? 'on' : ''}`}
-                style={{ '--tc': t.color }}
-                aria-pressed={team === t.id}
-                onClick={() => setTeam(t.id)}
-              >
-                <i />
-                {t.name}
-              </button>
-            ))}
-          </div>
-        </fieldset>
+        <p className="join-label" id="team-label">
+          응원 구단
+        </p>
+        <div className="join-teams" role="radiogroup" aria-labelledby="team-label">
+          {TEAMS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              role="radio"
+              aria-checked={team === t.id}
+              className={`join-team ${team === t.id ? 'on' : ''}`}
+              onClick={() => setTeam(t.id)}
+            >
+              <img src={`logos/${t.id}.jpg`} alt="" />
+              <span>{t.name}</span>
+            </button>
+          ))}
+        </div>
 
         {err && <p className="err">{err}</p>}
-        <div className="sticky-cta">
+        <div className="lt-cta">
           <button className="btn btn-led" type="submit" disabled={!ready || busy}>
             {busy ? '입장 중…' : '덕아웃 입장'}
           </button>
