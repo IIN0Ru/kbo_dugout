@@ -1,27 +1,27 @@
 /* DUGOUT 앱 스타일
-   확정 시안(I1, Spotify DESIGN.md 참고): 어두운 바탕, 강조색은 전광판 노랑 하나, 로고는 빨간 세 줄.
-   구단색은 선수 타일과 작은 점에만 쓴다. */
+   흰 바탕(2026.11 개편). 강조색은 전광판 노랑 하나, 로고는 빨간 세 줄.
+   구단색은 등번호·선수 타일·옅은 말풍선에만 쓴다. */
 :root {
-  --bg: #121212;
-  --surface: #1a1a1a;
-  --surface-2: #232323;
-  --line: #2c2c2c;
-  --fg: #ffffff;
-  --sub: #b3b3b3;
-  --mute: #7c7c7c;
+  --bg: #ffffff;
+  --surface: #f5f5f5;
+  --surface-2: #f0f0f0;
+  --line: #e5e5e5;
+  --fg: #111111;
+  --sub: #6e6e73;
+  --mute: #9a9a9f;
   --led: #ffc400;
   --red: #c8102e;
-  --danger: #f3727f;
+  --danger: #d30005;
   --f-body: 'Noto Sans KR', system-ui, -apple-system, sans-serif;
   --f-head: 'Black Han Sans', 'Noto Sans KR', sans-serif;
   --f-num: 'Anton', Impact, 'Arial Narrow', sans-serif;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; }
 body {
-  background: #0a0a0a;
+  background: #f2f2f2;
   color: var(--fg);
   font-family: var(--f-body);
   word-break: keep-all;
@@ -31,7 +31,7 @@ body {
 button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; }
 a { color: inherit; text-decoration: none; }
-:focus-visible { outline: 2px solid var(--led); outline-offset: 2px; }
+:focus-visible { outline: 2px solid #111; outline-offset: 2px; }
 
 .app {
   max-width: 440px;
@@ -50,8 +50,8 @@ a { color: inherit; text-decoration: none; }
 .pad-s { padding: 6px 0; font-size: 14px; }
 .err { color: var(--danger); font-size: 13px; margin: 0; }
 
-.topnote { position: sticky; top: 0; z-index: 30; background: #2a2200; color: var(--led); font-size: 11.5px; text-align: center; padding: 5px 12px; }
-.topnote.err-note { background: #3a0f14; color: #ffb3bb; }
+.topnote { position: sticky; top: 0; z-index: 30; background: #fff6d6; color: #7a5c00; font-size: 11.5px; text-align: center; padding: 5px 12px; }
+.topnote.err-note { background: #fff0f1; color: #b0000a; }
 
 /* 로고 */
 .logo { display: inline-flex; align-items: center; gap: 8px; }
@@ -70,7 +70,7 @@ a { color: inherit; text-decoration: none; }
 .icon-btn svg { width: 22px; height: 22px; }
 .link { border: 0; background: none; color: var(--sub); text-decoration: underline; text-underline-offset: 3px; font-size: 13px; padding: 4px 0; }
 .chip { border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px; padding: 7px 12px; font-size: 12.5px; font-weight: 500; }
-.chip.on { border-color: #5a2430; background: #3a1820; }
+.chip.on { border-color: #f5c2cf; background: #fdecf1; color: #c2185b; }
 .chip.on-led { background: var(--led); color: #111; border-color: var(--led); font-weight: 700; }
 .sticky-cta { position: sticky; bottom: 0; margin-top: auto; padding: 16px 0 calc(20px + env(safe-area-inset-bottom, 0px)); background: linear-gradient(180deg, rgba(18,18,18,0), var(--bg) 30%); }
 
@@ -113,7 +113,7 @@ a { color: inherit; text-decoration: none; }
 .field { display: grid; gap: 8px; border: 0; padding: 0; margin: 0; }
 .field > span, .field > legend { font-size: 13px; color: var(--sub); font-weight: 500; padding: 0; margin-bottom: 8px; }
 .field input, .field select, textarea { width: 100%; background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; font-size: 16px; }
-.field input:focus, .field select:focus, textarea:focus { border-color: var(--led); outline: none; }
+.field input:focus, .field select:focus, textarea:focus, .bench-login input:focus { border-color: #111; outline: none; }
 .team-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .team-chip { display: flex; align-items: center; gap: 9px; text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 14px; padding: 12px; font-size: 14px; font-weight: 500; }
 .team-chip i { width: 12px; height: 12px; border-radius: 50%; background: var(--tc); flex: none; box-shadow: 0 0 0 2px rgba(255,255,255,.15); }
@@ -204,15 +204,15 @@ a { color: inherit; text-decoration: none; }
 
 /* 발표자 선수 화면 */
 .bench-login { padding: 40px 24px; gap: 14px; }
-.bench-login h1 { margin: 10px 0 0; font-family: var(--f-head); font-weight: 400; font-size: 30px; }
+.bench-login h1 { margin: 14px 0 0; font: 900 34px/1.2 var(--f-body); letter-spacing: -0.04em; }
 .bench-login p { margin: 0; }
 .bench-login form { display: grid; gap: 12px; margin-top: 8px; }
-.bench-login input { width: 100%; background: var(--surface-2); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; font-size: 16px; }
+.bench-login input { width: 100%; background: var(--surface-2); border: 1px solid transparent; border-radius: 999px; padding: 14px 16px; font-size: 16px; }
 .bench-tag { margin-left: auto; font-size: 12px; font-weight: 700; color: #111; background: var(--led); border-radius: 999px; padding: 5px 10px; }
-.bench-sec { padding: 12px 16px 18px; display: grid; gap: 14px; border-bottom: 8px solid #0d0d0d; }
+.bench-sec { padding: 14px 20px 20px; display: grid; gap: 14px; border-bottom: 8px solid #f4f4f4; }
 .h-sm { margin: 0; font-size: 17px; }
 .bench-compose { display: grid; gap: 10px; background: var(--surface); border-radius: 18px; padding: 14px; }
-.bench-compose .who { color: #fff; font-weight: 500; }
+.bench-compose .who { display: flex; align-items: center; gap: 8px; color: #111; font-weight: 600; }
 textarea { resize: vertical; line-height: 1.5; }
 .row-end { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .row-end small { font-size: 11.5px; }
@@ -229,7 +229,7 @@ textarea { resize: vertical; line-height: 1.5; }
 .pick-form { display: grid; gap: 8px; }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-@media (min-width: 480px) { body { background: #050505; } .app { box-shadow: 0 0 0 1px #1d1d1d; } }
+@media (min-width: 480px) { body { background: #f2f2f2; } .app { box-shadow: 0 0 0 1px #e5e5e5; } }
 
 /* ===== 흰 바탕 화면 공통 (.lt) ===== */
 .lt { background: #fff; color: #111; }
@@ -366,3 +366,14 @@ textarea { resize: vertical; line-height: 1.5; }
 .chw .composer input:focus { border-color: #111; }
 .chw .send { background: #111; color: #fff; }
 .chw .locked { background: #f5f5f5; color: #6e6e73; }
+
+/* ===== 발표자 선수 화면 (흰 바탕) ===== */
+.bench .topbar { background: rgba(255,255,255,.96); border-bottom: 1px solid #f0f0f0; }
+.bench-tag { color: #111; }
+.bench-compose { background: #f5f5f5; }
+.bench-compose textarea { background: #fff; }
+.field select { appearance: none; background: #f5f5f5 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23111' stroke-width='2.2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center/18px; padding-right: 40px; border-color: transparent; }
+.reply-list li { background: #fff; border: 1px solid #ececec; }
+.reply-list li.picked { border-color: transparent; box-shadow: inset 0 0 0 2px var(--led); }
+.reply-list li.blocked { background: #fff0f1; border-color: #ffd6da; opacity: 1; color: #b0000a; }
+.link { border: 0; background: none; padding: 4px 0; font-size: 13px; font-weight: 600; color: #555; text-decoration: underline; text-underline-offset: 3px; }
