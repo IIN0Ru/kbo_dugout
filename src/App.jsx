@@ -6,6 +6,7 @@ import Plan from './pages/Plan.jsx'
 import Home from './pages/Home.jsx'
 import Channel from './pages/Channel.jsx'
 import Bench from './pages/Bench.jsx'
+import Me from './pages/Me.jsx'
 
 function ErrorBar() {
   const { error, store } = useSession()
@@ -28,6 +29,7 @@ export default function App() {
             <Route path="/home" element={<Home />} />
             <Route path="/channel/:playerId" element={<Channel />} />
             <Route path="/bench" element={<Bench />} />
+            <Route path="/me" element={<Me />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

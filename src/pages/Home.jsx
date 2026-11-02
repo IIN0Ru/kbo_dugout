@@ -47,6 +47,10 @@ function TopRow({ team, nickname }) {
               <b>{nickname}</b>
               <small>{team.name} 팬</small>
             </div>
+            <button type="button" role="menuitem" className="hm-mi" onClick={() => nav('/me')}>
+              마이페이지
+              <small>닉네임 · 응원 구단 · 구독 관리</small>
+            </button>
             <button
               type="button"
               role="menuitem"
@@ -151,7 +155,7 @@ export default function Home() {
           ))}
         </div>
         {links.home && (
-          <a className="hm-news" href={links.home} target="_blank" rel="noreferrer">
+          <a className="hm-news" style={{ '--tc': team.color }} href={links.home} target="_blank" rel="noreferrer">
             <span>
               <b>최신 소식</b>
               <small>구단 홈페이지에서 공지·뉴스 보기</small>
