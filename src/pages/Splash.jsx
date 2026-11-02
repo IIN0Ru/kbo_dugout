@@ -2,31 +2,46 @@ import { useNavigate } from 'react-router-dom'
 import { TEAMS } from '../data/teams.js'
 import { useSession } from '../session.jsx'
 
-// 앱 첫 화면 (확정 시안 I1): 등번호 모자이크 + 선수 말풍선 + 제목 + 로그인하기
+// 앱 첫 화면 (확정 시안 I1, 흰 바탕 버전)
+// 모자이크 칸 = 선수 등 사진 자리. photo에 파일 경로를 넣으면 사진으로 바뀐다.
+// 예) public/backs/lg-7.jpg 를 넣고 photo: 'backs/lg-7.jpg'
 const TILES = [
-  ['lg', 7, 3],
-  ['doosan', 17, 1],
-  ['hanwha', 1, 0],
-  ['nc', 52, 0],
-  ['kt', 10, 2],
-  ['samsung', 24, 0],
-  ['kiwoom', 33, 0],
-  ['kia', 5, 1],
-  ['lotte', 9, 0],
+  { team: 'lg', no: 7, badge: 3, photo: null },
+  { team: 'doosan', no: 17, badge: 1, photo: null },
+  { team: 'hanwha', no: 1, badge: 0, photo: null },
+  { team: 'nc', no: 52, badge: 0, photo: null },
+  { team: 'kt', no: 10, badge: 2, photo: null },
+  { team: 'samsung', no: 24, badge: 0, photo: null },
+  { team: 'kiwoom', no: 33, badge: 0, photo: null },
+  { team: 'kia', no: 5, badge: 1, photo: null },
+  { team: 'lotte', no: 9, badge: 0, photo: null },
 ]
+
+const color = (id) => TEAMS.find((t) => t.id === id).color
+
+function JerseyBack({ team, no }) {
+  return (
+    <svg className="jersey" viewBox="0 0 200 230" aria-hidden="true">
+      <path d="M58 8 Q100 26 142 8 L196 40 L178 92 L156 82 L156 230 L44 230 L44 82 L22 92 L4 40 Z" fill={color(team)} />
+      <path d="M58 8 Q100 26 142 8" fill="none" stroke="rgba(255,255,255,.55)" strokeWidth="5" />
+      <text x="100" y="160" textAnchor="middle" fontFamily="Anton, Impact, sans-serif" fontSize="86" fill="#fff">
+        {no}
+      </text>
+    </svg>
+  )
+}
 
 export default function Splash() {
   const nav = useNavigate()
   const { profile } = useSession()
-  const color = (id) => TEAMS.find((t) => t.id === id).color
 
   return (
     <main className="splash">
       <div className="mosaic" aria-hidden="true">
-        {TILES.map(([team, no, badge]) => (
-          <div key={team} style={{ background: color(team) }}>
-            #{no}
-            {badge > 0 && <span className="badge">{badge}</span>}
+        {TILES.map((t) => (
+          <div key={t.team} className="tile">
+            {t.photo ? <img src={t.photo} alt="" /> : <JerseyBack team={t.team} no={t.no} />}
+            {t.badge > 0 && <span className="badge">{t.badge}</span>}
           </div>
         ))}
       </div>
@@ -50,11 +65,7 @@ export default function Splash() {
           <br />
           하나의 덕아웃.
         </h1>
-        <button
-          className="btn btn-led"
-          type="button"
-          onClick={() => nav(profile ? '/home' : '/login')}
-        >
+        <button className="btn btn-led" type="button" onClick={() => nav(profile ? '/home' : '/login')}>
           {profile ? `${profile.nickname}님, 들어가기` : '로그인하기'}
         </button>
       </div>
