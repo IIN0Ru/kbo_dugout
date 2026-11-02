@@ -17,20 +17,20 @@ KBO 선수의 메시지를 **구독한 팬 모두가 똑같이 받는(1:N)** 공
 | `#/plan` | 청중 | 구독 플랜 (무료 / 멤버십, 결제 없는 목업) |
 | `#/home` | 청중 | 선수 목록, `?tab=picks`는 공개 픽 피드 |
 | `#/channel/:playerId` | 청중 | 선수 채널 — 메시지 보기, 답장(메시지당 3회, 100자), 금칙어 필터 |
-| `#/bench` | 발표자 | 선수 화면 — 전체 발송, 답장 목록, ❤️, 공개 픽 (비밀번호) |
+| `#/me` | 청중 | 마이페이지 — 닉네임·응원 구단·구독 관리·로그아웃 |
+| `#/bench` | 발표자 | 선수 화면 — 전체 발송, 답장 목록, ❤️, 공개 픽 (로그인 없음, 주소를 공개하지 않음) |
 
 ## 동작 모드
 
-- **로컬 모드** (`src/data/config.js`의 `firebaseConfig`가 비어 있을 때): 같은 브라우저의 탭끼리만 데이터가 공유됩니다. 선수 화면 비밀번호는 `dugout`.
+- **로컬 모드** (`src/data/config.js`의 `firebaseConfig`가 비어 있을 때): 같은 브라우저의 탭끼리만 데이터가 공유됩니다.
 - **Firebase 모드** (설정값을 넣었을 때): 청중 전원이 실시간으로 같은 데이터를 봅니다.
 
 ## Firebase 설정
 
 1. Firestore Database 생성 (서울 `asia-northeast3`, 프로덕션 모드)
-2. Authentication → 로그인 방법에서 **익명**과 **이메일/비밀번호** 사용 설정
-3. Authentication → 사용자 → 사용자 추가: `bench@dugout.app` + 발표자 비밀번호
-4. Firestore → 규칙 탭에 `firestore.rules` 내용을 붙여 넣고 게시
-5. 프로젝트 설정의 `firebaseConfig` 값을 `src/data/config.js`에 붙여 넣기
+2. Authentication → 로그인 방법에서 **익명** 사용 설정
+3. Firestore → 규칙 탭에 `firestore.rules` 내용을 붙여 넣고 게시
+4. 프로젝트 설정의 `firebaseConfig` 값을 `src/data/config.js`에 붙여 넣기
 
 ## 실행 · 배포
 

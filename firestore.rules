@@ -1,11 +1,11 @@
 rules_version = '2';
 // DUGOUT 시연용 Firestore 보안 규칙
-// - 청중: 익명 로그인. 선수 메시지·공개 픽은 읽기만, 답장은 '자기 것'만 쓰고 읽음
-// - 발표자: bench@dugout.app 계정으로 로그인. 메시지 발송, 모든 답장 읽기, ❤️·공개 픽
+// - 모두 익명 로그인. 발표자 화면(#/bench)은 외부에 공개하지 않는 시연용이라 따로 로그인하지 않는다.
+// - 그래서 로그인한 사람이면 선수 메시지 발송, 답장 읽기, ❤️·공개 픽이 가능하다.
+// - 답장은 자기 이름(uid)으로만 쓰고, 이미 쓴 답장은 ❤️·공개 픽 표시만 바꿀 수 있다.
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
-    function isBench() { return signedIn() && request.auth.token.email == 'bench@dugout.app'; }
 
     match /users/{uid} {
       allow read: if signedIn();
@@ -17,12 +17,15 @@ service cloud.firestore {
 
     match /messages/{id} {
       allow read: if signedIn();
-      allow create: if isBench() && request.resource.data.text.size() <= 200;
-      allow update, delete: if isBench();
+      allow create: if signedIn()
+        && request.resource.data.text is string
+        && request.resource.data.text.size() > 0
+        && request.resource.data.text.size() <= 200;
+      allow update, delete: if false;
     }
 
     match /replies/{id} {
-      allow read: if isBench() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow read: if signedIn();
       allow create: if signedIn()
         && request.resource.data.uid == request.auth.uid
         && request.resource.data.text is string
@@ -30,12 +33,15 @@ service cloud.firestore {
         && request.resource.data.text.size() <= 100
         && request.resource.data.heart == false
         && request.resource.data.picked == false;
-      allow update, delete: if isBench();
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['heart', 'picked']);
+      allow delete: if false;
     }
 
     match /picks/{id} {
       allow read: if signedIn();
-      allow write: if isBench();
+      allow create: if signedIn();
+      allow update, delete: if false;
     }
   }
 }

@@ -1,67 +1,15 @@
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 import { TEAMS, playersOfTeam, playerById, teamById, SEED_MESSAGES, RESTING } from '../data/teams.js'
 import { useSession, useSub } from '../session.jsx'
 import { Logo, PlayerTile, TeamDot, timeLabel } from '../components/ui.jsx'
 
-// 발표자용 선수 화면 (숨은 주소 #/bench). 비밀번호로 들어간다.
+// 발표자용 선수 화면 (숨은 주소 #/bench). 외부에 공개하지 않는 시연용이라 로그인 없이 바로 쓴다.
 export default function Bench() {
-  const { store } = useSession()
-  const [ok, setOk] = useState(() => {
-    try {
-      return sessionStorage.getItem('dugout-bench') === '1'
-    } catch {
-      return false
-    }
-  })
-  const [pw, setPw] = useState('')
-  const [err, setErr] = useState('')
-
-  if (!ok) {
-    return (
-      <main className="page bench-login">
-        <Logo />
-        <h1>선수 화면</h1>
-        <p className="muted">발표자 전용이에요. 비밀번호를 입력해 주세요.</p>
-        <form
-          onSubmit={async (e) => {
-            e.preventDefault()
-            if (!store) return
-            if (await store.benchLogin(pw)) {
-              try {
-                sessionStorage.setItem('dugout-bench', '1')
-              } catch {
-                /* 무시 */
-              }
-              setOk(true)
-            } else setErr('비밀번호가 맞지 않아요.')
-          }}
-        >
-          <input
-            id="bench-pw"
-            type="password"
-            value={pw}
-            onChange={(e) => {
-              setPw(e.target.value)
-              setErr('')
-            }}
-            placeholder="비밀번호"
-            autoComplete="current-password"
-          />
-          {err && <p className="err">{err}</p>}
-          <button className="btn btn-led" type="submit" disabled={!pw || !store}>
-            들어가기
-          </button>
-        </form>
-      </main>
-    )
-  }
   return <BenchMain />
 }
 
 function BenchMain() {
-  const { store, logout } = useSession()
-  const nav = useNavigate()
+  const { store } = useSession()
   const [playerId, setPlayerId] = useState('lg-7')
   const player = playerById(playerId)
   const team = teamById(player.teamId)
@@ -91,7 +39,7 @@ function BenchMain() {
   const send = async (e) => {
     e.preventDefault()
     const t = draft.trim()
-    if (!t) return
+    if (!t || !store) return
     await store.sendMessage(playerId, t)
     setDraft('')
     setMsgId(null)
@@ -102,16 +50,6 @@ function BenchMain() {
       <header className="topbar">
         <Logo />
         <span className="bench-tag">선수 화면 · 발표자</span>
-        <button
-          type="button"
-          className="link bench-out"
-          onClick={async () => {
-            await logout()
-            nav('/', { replace: true })
-          }}
-        >
-          로그아웃
-        </button>
       </header>
 
       <section className="bench-sec">
