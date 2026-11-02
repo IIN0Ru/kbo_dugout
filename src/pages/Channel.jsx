@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { playerById, teamById, SEED_MESSAGES, RESTING } from '../data/teams.js'
 import { useSession, useSub } from '../session.jsx'
-import { TopBar, PlayerTile, timeLabel, fmt } from '../components/ui.jsx'
+import { PlayerTile, timeLabel, fmt } from '../components/ui.jsx'
 import { isBlocked, REPLY_MAX_LEN, REPLIES_PER_MESSAGE } from '../data/filter.js'
 
 function readPlan() {
@@ -62,11 +62,11 @@ export default function Channel() {
     endRef.current?.scrollIntoView({ block: 'end' })
   }, [messages.length, mine.length])
 
-  if (!player) return <main className="page center">선수를 찾을 수 없어요.</main>
+  if (!player) return <main className="page lt center">선수를 찾을 수 없어요.</main>
   if (!profile) {
     return (
-      <main className="page center">
-        <p>먼저 입장권을 만들어 주세요.</p>
+      <main className="page lt center">
+        <p>먼저 닉네임과 응원 구단을 정해 주세요.</p>
         <button className="btn btn-led" type="button" onClick={() => nav('/login')}>
           로그인하기
         </button>
@@ -102,18 +102,27 @@ export default function Channel() {
   }
 
   return (
-    <main className="page channel" style={{ '--tc': team.color }}>
-      <TopBar
-        title={player.label}
-        sub={`${team.name} · 구독 팬 ${fmt(fans)}명`}
-        right={<PlayerTile player={player} size={34} radius={10} />}
-      />
+    <main className="page lt channel chw" style={{ '--tc': team.color }}>
+      <header className="chw-top">
+        <button className="lt-back" type="button" aria-label="뒤로" onClick={() => nav(-1)}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+            <path d="M15 5l-7 7 7 7" />
+          </svg>
+        </button>
+        <span className="chw-num">#{player.no}</span>
+        <span className="chw-title">
+          <b>
+            {player.pos} · {team.name}
+          </b>
+          <small>구독 팬 {fmt(fans)}명</small>
+        </span>
+      </header>
 
       {showInfo && (
         <div className="info">
           <p>
-            선수의 메시지는 구독한 팬 <b>모두에게 똑같이</b> 가요. 내 답장은 선수에게만 보이고, 선수가 고르면{' '}
-            <b>모두에게 공개</b>돼요.
+            선수 메시지는 <b>모두에게 똑같이</b>, 내 답장은 <b>선수에게만</b> 가요. 선수가 고른 답장은{' '}
+            <b>공개 픽</b>으로 모두에게 보여요.
           </p>
           <button type="button" aria-label="안내 닫기" onClick={() => setShowInfo(false)}>
             ×
@@ -144,7 +153,7 @@ export default function Channel() {
         {messages.map((m) => (
           <div key={m.id} className="turn">
             <div className="msg">
-              <PlayerTile player={player} size={30} radius={9} />
+              <PlayerTile player={player} size={30} radius={15} />
               <div>
                 <div className="bub pl">{m.text}</div>
                 <div className="meta">
@@ -212,7 +221,7 @@ export default function Channel() {
               value={text}
               maxLength={REPLY_MAX_LEN}
               onChange={(e) => setText(e.target.value)}
-              placeholder={`${player.label}에게 답장 (${left}번 남음)`}
+              placeholder={`답장 보내기 (${left}번 남음)`}
               autoComplete="off"
               enterKeyHint="send"
             />

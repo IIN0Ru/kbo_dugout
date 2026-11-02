@@ -30,7 +30,7 @@ export default function Plan() {
   }
 
   return (
-    <main className="page lt pl">
+    <main className="page lt plan-w">
       <header className="lt-nav">
         <button className="lt-back" type="button" aria-label="뒤로" onClick={() => nav(-1)}>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">

@@ -178,7 +178,7 @@ a { color: inherit; text-decoration: none; }
 .thread { flex: 1; overflow-y: auto; padding: 10px 14px 16px; display: flex; flex-direction: column; gap: 18px; }
 .turn { display: grid; gap: 8px; }
 .msg { display: flex; gap: 8px; align-items: flex-start; }
-.msg > div { display: grid; gap: 6px; max-width: 82%; }
+.msg > div { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; max-width: 82%; }
 .bub { border-radius: 18px; padding: 11px 14px; font-size: 15px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
 .bub.pl { background: var(--surface-2); border-top-left-radius: 6px; }
 .meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 11.5px; color: var(--mute); }
@@ -263,7 +263,7 @@ textarea { resize: vertical; line-height: 1.5; }
 .join-team.on::after { content: '✓'; position: absolute; right: 8px; top: 8px; width: 24px; height: 24px; border-radius: 50%; background: var(--led); color: #111; font: 800 13px/24px var(--f-body); text-align: center; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
 
 /* ===== 구독 플랜 (흰 바탕, 시안 B) ===== */
-.pl { min-height: 100dvh; display: flex; flex-direction: column; }
+.plan-w { min-height: 100dvh; display: flex; flex-direction: column; }
 .pl-body { flex: 1; display: flex; flex-direction: column; padding: 0 20px; }
 .pl-head { text-align: center; display: grid; justify-items: center; gap: 8px; padding-top: 20px; }
 .pl-logo { width: 72px; height: 38px; border-radius: 8px; object-fit: cover; }
@@ -284,7 +284,7 @@ textarea { resize: vertical; line-height: 1.5; }
 .pl-table .y { color: #c7c7cc; font-weight: 700; }
 .pl-table td.on .y { color: #0071e3; }
 .pl-table .n { color: #d1d1d6; }
-.pl .lt-cta { display: grid; gap: 8px; }
+.plan-w .lt-cta { display: grid; gap: 8px; }
 .pl-tiny { text-align: center; font-size: 11.5px; color: #8a8a8a; }
 
 /* ===== 홈 (흰 바탕, 시안 E 변형) ===== */
@@ -335,3 +335,34 @@ textarea { resize: vertical; line-height: 1.5; }
 .hm .pick-reply { box-shadow: 0 1px 4px rgba(0,0,0,.08); }
 .hm .pick-answer p { background: #fff; color: #111; }
 .hm .empty p { color: #6e6e73; }
+
+/* ===== 선수 채널 (흰 바탕, 시안 C: 구단색 말풍선) ===== */
+.chw { background: #fff; color: #111; }
+.chw-top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 8px; padding: 8px 16px 10px 6px; background: rgba(255,255,255,.96); backdrop-filter: blur(10px); }
+.chw-num { font: 400 44px/0.9 var(--f-num); color: var(--tc); }
+.chw-title { display: grid; gap: 3px; min-width: 0; padding-left: 4px; }
+.chw-title b { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.chw-title small { font-size: 12px; color: #8a8a8f; }
+.chw .info { margin: 2px 14px 6px; background: #111; border: 0; border-radius: 14px; }
+.chw .info p { color: #fff; }
+.chw .info b { color: var(--led); }
+.chw .info button { color: rgba(255,255,255,.7); }
+.chw .bub.pl { background: var(--tc); color: #fff; border-radius: 4px 18px 18px 18px; }
+.chw .rcpt { color: #8a8a8f; }
+.chw .meta { color: #9a9a9f; }
+.chw .bub.fan { background: #f5f5f5; color: #111; border-radius: 18px 4px 18px 18px; }
+.chw .bub.fan.blocked { background: #fff0f1; color: #d30005; }
+.chw .state { color: #8a8a8f; }
+.chw .st-heart { color: #e0245e; }
+.chw .st-pick { color: #111; background: var(--led); padding: 2px 8px; border-radius: 999px; }
+.chw .st-block { color: #d30005; }
+.chw .rest-card { background: #f5f5f5; }
+.chw .rest-pill { background: #111; color: var(--led); }
+.chw .gamecard { background: #111; color: #fff; }
+.chw .gamecard small { color: rgba(255,255,255,.55); }
+.chw .tiny.muted, .chw .empty p { color: #8a8a8f; }
+.chw .composer { background: #fff; border-top: 1px solid #f0f0f0; }
+.chw .composer input { background: #f5f5f5; border: 1px solid transparent; color: #111; }
+.chw .composer input:focus { border-color: #111; }
+.chw .send { background: #111; color: #fff; }
+.chw .locked { background: #f5f5f5; color: #6e6e73; }
