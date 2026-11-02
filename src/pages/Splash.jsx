@@ -10,7 +10,7 @@ const TILES = [
   { team: 'doosan', no: 17, badge: 1, photo: null },
   { team: 'kia', no: 54, badge: 1, photo: 'backs/kia-54.jpg' },
   { team: 'nc', no: 52, badge: 0, photo: null },
-  { team: 'kt', no: 10, badge: 2, photo: null },
+  { team: 'kt', no: 60, badge: 2, photo: 'backs/kt-60.jpg', pos: '42% 55%' },
   { team: 'samsung', no: 24, badge: 0, photo: null },
   { team: 'kiwoom', no: 33, badge: 0, photo: null },
   { team: 'hanwha', no: 1, badge: 0, photo: null },
@@ -40,7 +40,7 @@ export default function Splash() {
       <div className="mosaic" aria-hidden="true">
         {TILES.map((t) => (
           <div key={t.team} className="tile">
-            {t.photo ? <img src={t.photo} alt="" /> : <JerseyBack team={t.team} no={t.no} />}
+            {t.photo ? <img src={t.photo} alt="" style={t.pos ? { objectPosition: t.pos } : undefined} /> : <JerseyBack team={t.team} no={t.no} />}
             {t.badge > 0 && <span className="badge">{t.badge}</span>}
           </div>
         ))}
