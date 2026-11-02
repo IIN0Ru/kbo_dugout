@@ -122,6 +122,7 @@ export default function Home() {
     return m && !RESTING[p.id] && (!seen[p.id] || seen[p.id] < m.createdAt)
   }
   const unread = players.filter(isUnread).length
+  const activePlayer = players.find((p) => !RESTING[p.id])
 
   return (
     <main className="page lt hm">
@@ -169,6 +170,12 @@ export default function Home() {
         </button>
       </div>
 
+      {activePlayer && (
+        <p className="hm-hint">
+          지금은 <b>{activePlayer.label}</b> 선수에게만 답장을 보낼 수 있어요. 눌러서 메시지를 확인해 보세요!
+        </p>
+      )}
+
       <div className="hm-list">
         {players.map((p) => {
           const m = latest[p.id]
@@ -183,7 +190,7 @@ export default function Home() {
                 </b>
                 <small>{rest ? rest.note : m ? m.text : '아직 메시지가 없어요'}</small>
               </span>
-              <span className="hm-row-time">{m && !rest ? timeLabel(m.createdAt) : ''}</span>
+              {rest ? <span className="hm-rest">쉬는 중</span> : <span className="hm-row-time">{m ? timeLabel(m.createdAt) : ''}</span>}
             </Link>
           )
         })}

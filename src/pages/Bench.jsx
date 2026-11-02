@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { TEAMS, playersOfTeam, playerById, teamById, SEED_MESSAGES } from '../data/teams.js'
+import { TEAMS, playersOfTeam, playerById, teamById, SEED_MESSAGES, RESTING } from '../data/teams.js'
 import { useSession, useSub } from '../session.jsx'
 import { Logo, PlayerTile, TeamDot, timeLabel } from '../components/ui.jsx'
 
@@ -131,6 +131,7 @@ function BenchMain() {
                 {playersOfTeam(t.id).map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.label}
+                    {RESTING[p.id] ? ' (쉬는 중)' : ''}
                   </option>
                 ))}
               </optgroup>
@@ -152,7 +153,9 @@ function BenchMain() {
             placeholder="구독한 팬 모두에게 보낼 메시지"
           />
           <div className="row-end">
-            <small className="muted">특정 팬 한 명에게만 보내는 기능은 없어요</small>
+            <small className="muted">
+              {RESTING[playerId] ? '쉬는 중인 선수예요. 팬 화면엔 경기 기록 카드만 보여요' : '특정 팬 한 명에게만 보내는 기능은 없어요'}
+            </small>
             <button className="btn btn-led btn-sm" type="submit" disabled={!draft.trim()}>
               모두에게 보내기
             </button>

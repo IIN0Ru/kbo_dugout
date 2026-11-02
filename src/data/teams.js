@@ -14,18 +14,18 @@ export const TEAMS = [
   { id: 'kiwoom', name: '키움 히어로즈', short: '키움', color: '#570514' },
 ]
 
-// 구단마다 가상 선수 3명 (포지션, 등번호)
+// 구단마다 가상 선수 2명 (포지션, 등번호). 첫 번째는 메시지를 보내는 선수, 두 번째는 '메시지 쉬는 중'.
 const ROSTER = {
-  lg: [['외야수', 7], ['투수', 17], ['포수', 22]],
-  hanwha: [['투수', 1], ['내야수', 5], ['외야수', 25]],
-  ssg: [['내야수', 14], ['투수', 29], ['외야수', 8]],
-  samsung: [['투수', 18], ['외야수', 33], ['포수', 2]],
-  nc: [['내야수', 6], ['투수', 47], ['외야수', 31]],
-  kt: [['외야수', 10], ['투수', 52], ['내야수', 4]],
-  lotte: [['외야수', 24], ['투수', 21], ['내야수', 9]],
-  kia: [['내야수', 3], ['투수', 54], ['외야수', 12]],
-  doosan: [['포수', 25], ['투수', 15], ['내야수', 16]],
-  kiwoom: [['외야수', 51], ['투수', 40], ['내야수', 13]],
+  lg: [['외야수', 7], ['투수', 17]],
+  hanwha: [['투수', 1], ['내야수', 5]],
+  ssg: [['내야수', 14], ['투수', 29]],
+  samsung: [['외야수', 33], ['포수', 2]],
+  nc: [['내야수', 6], ['투수', 47]],
+  kt: [['외야수', 10], ['투수', 52]],
+  lotte: [['외야수', 24], ['투수', 21]],
+  kia: [['내야수', 3], ['투수', 54]],
+  doosan: [['포수', 25], ['투수', 15]],
+  kiwoom: [['외야수', 51], ['투수', 40]],
 }
 
 export const PLAYERS = TEAMS.flatMap((t) =>
@@ -47,17 +47,29 @@ export const playersOfTeam = (teamId) => PLAYERS.filter((p) => p.teamId === team
 const T0 = Date.UTC(2026, 9, 27, 12, 40) // 2026-10-27 21:40 KST
 export const SEED_MESSAGES = [
   { id: 'seed-lg-7-1', playerId: 'lg-7', text: '오늘 응원 소리 덕아웃까지 다 들렸어요. 내일도 잠실에서 봬요!', createdAt: T0 },
-  { id: 'seed-lg-17-1', playerId: 'lg-17', text: '다음 홈경기 응원 문구, 여러분이 정해 주세요!', createdAt: T0 + 60_000 },
-  { id: 'seed-hanwha-1-1', playerId: 'hanwha-1', text: '비 와서 경기 취소됐네요. 다들 조심히 들어가세요.', createdAt: T0 + 120_000 },
-  { id: 'seed-kia-3-1', playerId: 'kia-3', text: '오늘 수비 실책 하나, 내일 꼭 갚을게요.', createdAt: T0 + 180_000 },
-  { id: 'seed-doosan-25-1', playerId: 'doosan-25', text: '포수 마스크 새로 바꿨어요. 잘 보이시나요?', createdAt: T0 + 240_000 },
-  { id: 'seed-lotte-24-1', playerId: 'lotte-24', text: '사직 원정 응원 오신 분들 감사합니다. 목소리 크게 들렸어요!', createdAt: T0 + 300_000 },
+  { id: 'seed-hanwha-1-1', playerId: 'hanwha-1', text: '비 와서 경기 취소됐네요. 다들 조심히 들어가세요.', createdAt: T0 + 60_000 },
+  { id: 'seed-ssg-14-1', playerId: 'ssg-14', text: '오늘 3루 쪽 응원석 함성 최고였어요. 다음 홈경기도 기대할게요!', createdAt: T0 + 120_000 },
+  { id: 'seed-samsung-33-1', playerId: 'samsung-33', text: '대구 날씨 덥죠? 물 많이 드시고 오세요. 오늘도 힘낼게요.', createdAt: T0 + 180_000 },
+  { id: 'seed-nc-6-1', playerId: 'nc-6', text: '창원 홈 3연전 마지막 날! 끝까지 같이 가요.', createdAt: T0 + 240_000 },
+  { id: 'seed-kt-10-1', playerId: 'kt-10', text: '수원 오신 분들 감사해요. 오늘 홈런 공 주우신 분 계신가요?', createdAt: T0 + 300_000 },
+  { id: 'seed-lotte-24-1', playerId: 'lotte-24', text: '사직 원정 응원 오신 분들 감사합니다. 목소리 크게 들렸어요!', createdAt: T0 + 360_000 },
+  { id: 'seed-kia-3-1', playerId: 'kia-3', text: '오늘 수비 실책 하나, 내일 꼭 갚을게요.', createdAt: T0 + 420_000 },
+  { id: 'seed-doosan-25-1', playerId: 'doosan-25', text: '포수 마스크 새로 바꿨어요. 잘 보이시나요?', createdAt: T0 + 480_000 },
+  { id: 'seed-kiwoom-51-1', playerId: 'kiwoom-51', text: '고척에서 오늘 처음 직관 오신 분 손! 다음엔 이기는 경기 보여 드릴게요.', createdAt: T0 + 540_000 },
 ]
 
 // 쉬는 중 표시(시즌 모드). 메시지 없이 경기 기록 카드만 보여 준다.
 export const RESTING = {
+  'lg-17': { note: '선발 등판 준비 · 메시지 쉬는 중', card: '최근 등판 · 6이닝 2실점 7탈삼진' },
+  'hanwha-5': { note: '부상 회복 중 · 메시지 쉬는 중', card: '최근 5경기 · 타율 .286 · 1홈런' },
+  'ssg-29': { note: '선발 등판 준비 · 메시지 쉬는 중', card: '최근 등판 · 5⅓이닝 3실점 5탈삼진' },
   'samsung-2': { note: '부상 회복 중 · 메시지 쉬는 중', card: '최근 5경기 · 타율 .312 · 2홈런' },
-  'nc-47': { note: '선발 등판 준비 · 메시지 쉬는 중', card: '최근 등판 · 6이닝 2실점 7탈삼진' },
+  'nc-47': { note: '선발 등판 준비 · 메시지 쉬는 중', card: '최근 등판 · 7이닝 1실점 8탈삼진' },
+  'kt-52': { note: '휴식일 · 메시지 쉬는 중', card: '최근 등판 · 1이닝 무실점 · 시즌 12세이브' },
+  'lotte-21': { note: '선발 등판 준비 · 메시지 쉬는 중', card: '최근 등판 · 6이닝 3실점 6탈삼진' },
+  'kia-54': { note: '휴식일 · 메시지 쉬는 중', card: '최근 등판 · 1⅔이닝 무실점 · 시즌 18홀드' },
+  'doosan-15': { note: '선발 등판 준비 · 메시지 쉬는 중', card: '최근 등판 · 5이닝 2실점 4탈삼진' },
+  'kiwoom-40': { note: '휴식일 · 메시지 쉬는 중', card: '최근 등판 · 2이닝 1실점 3탈삼진' },
 }
 
 // 구단 공식 채널 (2026.11 웹 검색으로 확인한 주소). 확인하지 못한 채널은 비워 두면 버튼이 안 보인다.
