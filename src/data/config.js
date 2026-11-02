@@ -2,12 +2,12 @@
 // (로컬 모드: 같은 브라우저의 탭끼리만 데이터가 공유됨)
 // Firebase 콘솔 → 프로젝트 설정 → 내 앱 → firebaseConfig 값을 그대로 붙여 넣는다.
 export const firebaseConfig = {
-  apiKey: '',
-  authDomain: '',
-  projectId: '',
-  storageBucket: '',
-  messagingSenderId: '',
-  appId: '',
+  apiKey: 'AIzaSyDCggcQmTvU8EyW9Feu9Kswr3vMqcCSuf0',
+  authDomain: 'dugout-demo.firebaseapp.com',
+  projectId: 'dugout-demo',
+  storageBucket: 'dugout-demo.firebasestorage.app',
+  messagingSenderId: '800001208979',
+  appId: '1:800001208979:web:5c15749ee938d5c7bb1366',
 }
 
 export const useFirebase = Boolean(firebaseConfig.apiKey && firebaseConfig.projectId)
