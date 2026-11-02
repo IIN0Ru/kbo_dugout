@@ -6,15 +6,15 @@ import { useSession } from '../session.jsx'
 // 모자이크 칸 = 선수 등 사진 자리. photo에 파일 경로를 넣으면 사진으로 바뀐다.
 // 예) public/backs/lg-7.jpg 를 넣고 photo: 'backs/lg-7.jpg'
 const TILES = [
-  { team: 'lg', no: 35, badge: 3, photo: 'backs/lg-35.jpg', pos: '45% 70%' },
-  { team: 'hanwha', no: 99, badge: 0, photo: 'backs/hanwha-99.jpg', pos: '45% 60%' },
-  { team: 'kia', no: 54, badge: 1, photo: 'backs/kia-54.jpg' },
-  { team: 'samsung', no: 5, badge: 0, photo: 'backs/samsung-5.jpg', pos: '50% 60%' },
-  { team: 'kt', no: 60, badge: 2, photo: 'backs/kt-60.jpg', pos: '42% 55%' },
-  { team: 'ssg', no: 14, badge: 1, photo: 'backs/ssg-14.jpg', pos: '50% 60%' },
-  { team: 'doosan', no: 25, badge: 0, photo: 'backs/doosan-25.jpg', pos: '35% 60%' },
-  { team: 'nc', no: 59, badge: 0, photo: 'backs/nc-59.jpg', pos: '50% 50%' },
-  { team: 'lotte', no: 51, badge: 0, photo: 'backs/lotte-51.jpg', pos: '30% 55%' },
+  { team: 'lg', no: 35, photo: 'backs/lg-35.jpg', pos: '45% 70%' },
+  { team: 'hanwha', no: 99, photo: 'backs/hanwha-99.jpg', pos: '45% 60%' },
+  { team: 'kia', no: 54, photo: 'backs/kia-54.jpg' },
+  { team: 'samsung', no: 5, photo: 'backs/samsung-5.jpg', pos: '50% 60%' },
+  { team: 'kt', no: 60, photo: 'backs/kt-60.jpg', pos: '42% 55%' },
+  { team: 'ssg', no: 14, photo: 'backs/ssg-14.jpg', pos: '50% 60%' },
+  { team: 'doosan', no: 25, photo: 'backs/doosan-25.jpg', pos: '35% 60%' },
+  { team: 'nc', no: 59, photo: 'backs/nc-59.jpg', pos: '50% 50%' },
+  { team: 'lotte', no: 51, photo: 'backs/lotte-51.jpg', pos: '30% 55%' },
 ]
 
 const color = (id) => TEAMS.find((t) => t.id === id).color
@@ -41,7 +41,6 @@ export default function Splash() {
         {TILES.map((t) => (
           <div key={t.team} className="tile">
             {t.photo ? <img src={t.photo} alt="" style={t.pos ? { objectPosition: t.pos } : undefined} /> : <JerseyBack team={t.team} no={t.no} />}
-            {t.badge > 0 && <span className="badge">{t.badge}</span>}
           </div>
         ))}
       </div>
