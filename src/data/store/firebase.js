@@ -4,6 +4,7 @@ import {
   getAuth,
   signInAnonymously,
   signInWithEmailAndPassword,
+  signOut,
   onAuthStateChanged,
 } from 'firebase/auth'
 import {
@@ -43,6 +44,12 @@ export const firebaseStore = {
   async init() {
     let u = await currentUser()
     if (!u) u = (await signInAnonymously(auth)).user
+    return { uid: u.uid }
+  },
+  // 로그아웃: 지금 계정에서 나가고 새 익명 계정으로 바꾼다 (같은 기기의 다음 사람이 이전 답장을 못 보게)
+  async logout() {
+    await signOut(auth)
+    const u = (await signInAnonymously(auth)).user
     return { uid: u.uid }
   },
   async saveProfile(userId, profile) {

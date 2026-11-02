@@ -58,6 +58,15 @@ export const localStore = {
     }
     return { uid: id }
   },
+  async logout() {
+    const id = uid()
+    try {
+      localStorage.setItem('dugout-uid', id)
+    } catch {
+      /* 무시 */
+    }
+    return { uid: id }
+  },
   async saveProfile(userId, profile) {
     db.users[userId] = { ...profile, createdAt: Date.now() }
     commit()

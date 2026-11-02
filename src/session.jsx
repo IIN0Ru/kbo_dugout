@@ -47,8 +47,25 @@ export function SessionProvider({ children }) {
     if (store && uid) await store.saveProfile(uid, p)
   }
 
+  // 청중 로그아웃: 프로필·플랜·읽음 표시를 지우고 새 계정으로 바꾼다
+  const logout = async () => {
+    try {
+      for (const k of [PROFILE_KEY, 'dugout-plan', 'dugout-seen', 'dugout-bench']) {
+        localStorage.removeItem(k)
+        sessionStorage.removeItem(k)
+      }
+    } catch {
+      /* 무시 */
+    }
+    setProfileState(null)
+    if (store) {
+      const { uid: next } = await store.logout()
+      setUid(next)
+    }
+  }
+
   return (
-    <Ctx.Provider value={{ store, uid, profile, saveProfile, error }}>{children}</Ctx.Provider>
+    <Ctx.Provider value={{ store, uid, profile, saveProfile, logout, error }}>{children}</Ctx.Provider>
   )
 }
 

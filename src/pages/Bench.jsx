@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { TEAMS, playersOfTeam, playerById, teamById, SEED_MESSAGES } from '../data/teams.js'
 import { useSession, useSub } from '../session.jsx'
 import { Logo, PlayerTile, TeamDot, timeLabel } from '../components/ui.jsx'
@@ -59,7 +60,8 @@ export default function Bench() {
 }
 
 function BenchMain() {
-  const { store } = useSession()
+  const { store, logout } = useSession()
+  const nav = useNavigate()
   const [playerId, setPlayerId] = useState('lg-7')
   const player = playerById(playerId)
   const team = teamById(player.teamId)
@@ -100,6 +102,16 @@ function BenchMain() {
       <header className="topbar">
         <Logo />
         <span className="bench-tag">선수 화면 · 발표자</span>
+        <button
+          type="button"
+          className="link bench-out"
+          onClick={async () => {
+            await logout()
+            nav('/', { replace: true })
+          }}
+        >
+          로그아웃
+        </button>
       </header>
 
       <section className="bench-sec">

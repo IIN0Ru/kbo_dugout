@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { SEED_MESSAGES, RESTING, TEAM_LINKS, playersOfTeam, teamById } from '../data/teams.js'
 import { useSession, useSub } from '../session.jsx'
@@ -21,6 +21,10 @@ const CHANNELS = [
 ]
 
 function TopRow({ team, nickname }) {
+  const { logout } = useSession()
+  const nav = useNavigate()
+  const [open, setOpen] = useState(false)
+  const [busy, setBusy] = useState(false)
   return (
     <header className="lt-nav hm-top">
       <span className="lt-bars" aria-hidden="true">
@@ -28,10 +32,38 @@ function TopRow({ team, nickname }) {
         <i />
         <i />
       </span>
-      <span className="hm-me">
+      <button type="button" className="hm-me" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
         <img src={`logos/${team.id}.jpg`} alt="" />
         {nickname}
-      </span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+      {open && (
+        <>
+          <button type="button" className="hm-scrim" aria-label="닫기" onClick={() => setOpen(false)} />
+          <div className="hm-menu" role="menu">
+            <div className="hm-menu-h">
+              <b>{nickname}</b>
+              <small>{team.name} 팬</small>
+            </div>
+            <button
+              type="button"
+              role="menuitem"
+              className="hm-logout"
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true)
+                await logout()
+                nav('/', { replace: true })
+              }}
+            >
+              {busy ? '로그아웃 중…' : '로그아웃'}
+            </button>
+            <small className="hm-menu-note">로그아웃하면 이 기기에서 보낸 답장 기록도 사라져요.</small>
+          </div>
+        </>
+      )}
     </header>
   )
 }
