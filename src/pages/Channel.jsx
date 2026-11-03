@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { playerById, teamById, playersOfTeam, SEED_MESSAGES, RESTING } from '../data/teams.js'
+import { playerById, teamById, SEED_MESSAGES, RESTING } from '../data/teams.js'
 import { useSession, useSub } from '../session.jsx'
 import { PlayerTile, timeLabel, fmt } from '../components/ui.jsx'
 import { isBlocked, REPLY_MAX_LEN, REPLIES_PER_MESSAGE } from '../data/filter.js'
@@ -140,14 +140,6 @@ export default function Channel() {
               <span>{rest.card}</span>
             </div>
             <p className="tiny muted">선수는 메시지를 보낼 의무가 없어요. 쉬는 동안엔 경기 기록 카드가 채널을 채워요.</p>
-            {(() => {
-              const other = playersOfTeam(team.id).find((q) => !RESTING[q.id])
-              return other ? (
-                <button type="button" className="btn btn-led rest-go" onClick={() => nav(`/channel/${other.id}`, { replace: true })}>
-                  {other.label}에게 답장하러 가기
-                </button>
-              ) : null
-            })()}
           </div>
         )}
 
