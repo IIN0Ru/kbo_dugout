@@ -348,7 +348,7 @@ textarea { resize: vertical; line-height: 1.5; }
 .chw .info b { color: var(--led); }
 .chw .info button { color: rgba(255,255,255,.7); }
 .chw .bub.pl { background: #f7eef2; background: color-mix(in srgb, var(--tc) 9%, #fff); color: #111; border-radius: 4px 18px 18px 18px; }
-.chw .rcpt { color: #8a8a8f; }
+.chw .rcpt { color: #f2b200; }
 .chw .meta { color: #9a9a9f; }
 .chw .bub.fan { background: #f0f0f0; color: #111; border-radius: 18px 4px 18px 18px; }
 .chw .bub.fan.blocked { background: #fff0f1; color: #d30005; }
