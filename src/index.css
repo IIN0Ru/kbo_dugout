@@ -481,3 +481,73 @@ textarea { resize: vertical; line-height: 1.5; }
 .bk-in input:focus { outline: none; border-color: #111; background: #fff; }
 .bk-send { flex: none; border: 0; border-radius: 20px; background: var(--led); color: #111; font-size: 14px; font-weight: 700; padding: 0 16px; height: 42px; }
 .bk-send:disabled { opacity: .4; }
+
+/* ===== 경계 개선 (2026.11 피드백, 시안 B: 옅은 회색 바탕 + 떠 있는 흰 카드) =====
+   바탕은 옅은 회색, 누를 수 있는 것과 카드는 흰색 + 부드러운 그림자로 띄운다.
+   첫 화면(스플래시)은 사진 모자이크가 흰색으로 이어지므로 흰 바탕 그대로 둔다. */
+:root { --page: #f2f3f5; --card: #fff; --lift: 0 1px 2px rgba(0,0,0,.05), 0 4px 14px -6px rgba(0,0,0,.14); --field-bd: #e2e2e6; }
+.app { background: var(--page); }
+.lt, .chw { background: var(--page); }
+.lt-nav, .chw-top, .bench .topbar { background: rgba(242,243,245,.94); }
+.lt-cta { background: linear-gradient(180deg, rgba(242,243,245,0), var(--page) 30%); }
+
+/* 주요 버튼: 노란 그림자로 띄우고, 비활성은 회색으로 확실히 구분 */
+.btn-led { box-shadow: 0 6px 16px -6px rgba(200,150,0,.55); }
+.btn:disabled { opacity: 1; background: #e3e4e8; color: #9a9aa0; box-shadow: none; }
+
+/* 입력칸: 흰 바탕 + 테두리 */
+.join-pill, .bench-login input, .field input, .field select, textarea { background-color: #fff; border: 1.5px solid var(--field-bd); }
+.join-pill:focus-within, .bench-login input:focus, .field input:focus, .field select:focus, textarea:focus { border-color: #111; }
+.chw .composer input, .bk-in input { background: #fff; border: 1.5px solid var(--field-bd); }
+
+/* 탭 */
+.pl-seg { background: #e6e7ea; }
+.pl-seg button.on { box-shadow: 0 1px 3px rgba(0,0,0,.14); }
+
+/* 입장 화면 구단 카드 */
+.join-team { border-color: transparent; box-shadow: var(--lift); }
+.join-team.on { border-color: #111; }
+
+/* 홈 */
+.hm-me { background: #fff; box-shadow: var(--lift); }
+.hm-card { background: #fff; box-shadow: var(--lift); }
+.hm-ch a { background: #f5f5f7; box-shadow: none; }
+.hm-ch a:active { background: #ebebef; }
+.hm-sec button { background: #fff; border-radius: 999px; padding: 6px 12px; box-shadow: var(--lift); }
+.hm-list { margin: 8px 20px 0; background: #fff; border-radius: 18px; box-shadow: var(--lift); overflow: hidden; }
+.hm-row { padding: 12px 16px; }
+.hm-row::after { left: 74px; right: 16px; }
+.hm-row:active { background: #f5f5f7; }
+.hm-rest { background: #f2f3f5; }
+.hm-hint { margin-top: 6px; }
+.hm .pick { background: #fff; box-shadow: var(--lift); }
+.hm .pick-reply { background: #f5f5f7; box-shadow: none; }
+.hm .pick-answer p { background: #f5f5f7; }
+
+/* 선수 채널 */
+.chw .bub.fan { background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+.chw .rest-card { background: #fff; box-shadow: var(--lift); }
+.chw .locked { background: #fff; border: 1.5px solid var(--field-bd); }
+.chw .composer { background: #fff; }
+
+/* 마이페이지 */
+.me-sec { border-bottom-color: #e6e7ea; }
+.me-row { border-color: transparent; box-shadow: var(--lift); }
+.me-plan { background: #fff; box-shadow: var(--lift); }
+.hm-mi, .hm-logout { background: #f2f3f5; }
+
+/* 구독 플랜 비교표 */
+.pl-table { background: #fff; border-radius: 16px; box-shadow: var(--lift); overflow: hidden; }
+.pl-table th:first-child, .pl-table td:first-child { padding-left: 14px; }
+.pl-table td { border-top-color: #f0f0f2; }
+
+/* 발표자 화면 */
+.bk-list { margin: 0 16px; background: #fff; border-radius: 18px; box-shadow: var(--lift); overflow: hidden; }
+.bk-list:empty { display: none; }
+.bk-row { padding: 10px 14px; }
+.bk-row:active { background: #f5f5f7; }
+.bk-more { background: #fff; box-shadow: var(--lift); }
+.bk-quiet { margin-top: 0; }
+.bk-compose { background: #fff; }
+.bench-compose { background: #fff; box-shadow: var(--lift); }
+.reply-list li { border-color: transparent; box-shadow: var(--lift); }
