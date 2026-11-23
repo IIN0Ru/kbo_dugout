@@ -551,3 +551,23 @@ textarea { resize: vertical; line-height: 1.5; }
 .bk-compose { background: #fff; }
 .bench-compose { background: #fff; box-shadow: var(--lift); }
 .reply-list li { border-color: transparent; box-shadow: var(--lift); }
+
+/* ===== 공개 픽: 채팅방 안 카드(A) + 새 픽 알림(B) ===== */
+.pick-led { flex: none; background: #111; color: var(--led); font: 700 11px/1 var(--f-num, monospace); letter-spacing: .06em; padding: 4px 6px; border-radius: 4px; }
+.pick-card { display: grid; gap: 8px; background: #fff; border: 1.5px solid var(--tc); border-radius: 16px; padding: 12px 14px; color: #111; scroll-margin: 90px; }
+.pick-card.mine-pick { box-shadow: 0 0 0 3px var(--led); }
+.pick-card-h { display: flex; align-items: center; gap: 8px; }
+.pick-card-h small { font-size: 12px; color: #8a8a8f; }
+.pick-card-q { margin: 0; font-size: 12.5px; color: #8a8a8f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pick-card-r { margin: 0; display: grid; gap: 2px; font-size: 14.5px; line-height: 1.45; background: #f5f5f5; border-radius: 12px; padding: 9px 12px; overflow-wrap: anywhere; }
+.pick-card-r b { font-size: 12px; color: #6e6e73; }
+.pick-card-a { display: flex; gap: 8px; align-items: flex-start; }
+.pick-card-a p { margin: 0; font-size: 15px; line-height: 1.45; font-weight: 600; background: color-mix(in srgb, var(--tc) 9%, #fff); border-radius: 4px 16px 16px 16px; padding: 9px 12px; overflow-wrap: anywhere; }
+.pick-toast { position: absolute; left: 12px; right: 12px; top: calc(100% + 4px); display: flex; align-items: center; gap: 10px; border: 0; border-radius: 14px; background: #111; color: #fff; padding: 10px 14px; text-align: left; box-shadow: 0 10px 24px rgba(0,0,0,.22); animation: pickIn .25s ease-out, pickOut .3s ease-in 2.7s forwards; }
+.pick-toast-t { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.pick-toast-t b { font-size: 12.5px; color: var(--led); }
+.pick-toast-t small { font-size: 13.5px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pick-toast i { font-style: normal; color: rgba(255,255,255,.6); font-size: 18px; }
+@keyframes pickIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+@keyframes pickOut { to { opacity: 0; transform: translateY(-8px); } }
+@media (prefers-reduced-motion: reduce) { .pick-toast { animation: none; } }

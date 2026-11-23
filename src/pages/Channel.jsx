@@ -28,6 +28,8 @@ export default function Channel() {
     [],
   )
   const fans = useSub(store ? (cb) => store.subscribeFanCount(cb) : null, [store], 0)
+  const allPicks = useSub(store ? (cb) => store.subscribePicks(cb) : null, [store], [])
+  const picks = useMemo(() => allPicks.filter((k) => k.playerId === playerId), [allPicks, playerId])
 
   const messages = useMemo(
     () => [...SEED_MESSAGES.filter((m) => m.playerId === playerId), ...live].sort((a, b) => a.createdAt - b.createdAt),
@@ -39,6 +41,32 @@ export default function Channel() {
     for (const r of [...mine].sort((a, b) => a.createdAt - b.createdAt)) (g[r.messageId] ||= []).push(r)
     return g
   }, [mine])
+
+  // 선수 메시지 묶음(turn)과 공개 픽 카드를 시간순으로 섞는다 → 모든 팬의 채팅방에 같은 카드가 끼어든다
+  const timeline = useMemo(
+    () =>
+      [
+        ...messages.map((m) => ({ kind: 'turn', at: m.createdAt, m })),
+        ...picks.map((k) => ({ kind: 'pick', at: k.createdAt, k })),
+      ].sort((a, b) => a.at - b.at),
+    [messages, picks],
+  )
+
+  // 새 공개 픽 알림: 채팅방에 들어온 뒤 새로 올라온 픽만 상단에 3초 띄운다
+  const mountedAt = useRef(Date.now())
+  const announced = useRef(new Set())
+  const [toast, setToast] = useState(null)
+  useEffect(() => {
+    const fresh = picks.filter((k) => k.createdAt > mountedAt.current && !announced.current.has(k.id))
+    if (!fresh.length) return
+    fresh.forEach((k) => announced.current.add(k.id))
+    setToast(fresh.sort((a, b) => b.createdAt - a.createdAt)[0])
+  }, [picks])
+  useEffect(() => {
+    if (!toast) return
+    const t = setTimeout(() => setToast(null), 3000)
+    return () => clearTimeout(t)
+  }, [toast])
 
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
@@ -60,7 +88,7 @@ export default function Channel() {
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: 'end' })
-  }, [messages.length, mine.length])
+  }, [messages.length, mine.length, picks.length])
 
   if (!player) return <main className="page lt center">선수를 찾을 수 없어요.</main>
   if (!profile) {
@@ -116,6 +144,26 @@ export default function Channel() {
           </b>
           <small>구독 팬 {fmt(fans)}명</small>
         </span>
+        {toast && (
+          <button
+            type="button"
+            className="pick-toast"
+            key={toast.id}
+            onClick={() => {
+              document.getElementById(`pick-${toast.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+              setToast(null)
+            }}
+          >
+            <span className="pick-led">PICK</span>
+            <span className="pick-toast-t">
+              <b>{toast.replyId && mine.some((r) => r.id === toast.replyId) ? '내 답장이 뽑혔어요!' : `${toast.nickname} 님 답장이 뽑혔어요`}</b>
+              <small>
+                #{player.no} “{toast.answer}”
+              </small>
+            </span>
+            <i aria-hidden="true">›</i>
+          </button>
+        )}
       </header>
 
       {showInfo && (
@@ -150,7 +198,30 @@ export default function Channel() {
           </div>
         )}
 
-        {messages.map((m) => (
+        {timeline.map((it) => {
+          if (it.kind === 'pick') {
+            const k = it.k
+            const isMine = mine.some((r) => r.id === k.replyId)
+            return (
+              <article key={k.id} id={`pick-${k.id}`} className={`pick-card ${isMine ? 'mine-pick' : ''}`}>
+                <div className="pick-card-h">
+                  <span className="pick-led">PICK</span>
+                  <small>{isMine ? '내 답장을 선수가 골랐어요' : '선수가 고른 답장'} · {timeLabel(k.createdAt)}</small>
+                </div>
+                {k.messageText && <p className="pick-card-q">“{k.messageText}”에 대한 답장</p>}
+                <p className="pick-card-r">
+                  <b>{k.nickname}</b>
+                  {k.replyText}
+                </p>
+                <div className="pick-card-a">
+                  <PlayerTile player={player} size={24} radius={12} />
+                  <p>{k.answer}</p>
+                </div>
+              </article>
+            )
+          }
+          const m = it.m
+          return (
           <div key={m.id} className="turn">
             <div className="msg">
               <PlayerTile player={player} size={30} radius={15} />
@@ -179,7 +250,8 @@ export default function Channel() {
               </div>
             ))}
           </div>
-        ))}
+          )
+        })}
         <div ref={endRef} />
       </div>
 
