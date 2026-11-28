@@ -41,7 +41,7 @@ function ChatList() {
   const rooms = useMemo(() => {
     const by = {}
     for (const r of replies) {
-      if (r.blocked) continue
+      if (r.blocked || r.removed) continue
       const g = (by[r.playerId] ||= { last: null, count: 0, unread: 0 })
       g.count += 1
       if (!g.last || g.last.createdAt < r.createdAt) g.last = r
@@ -144,19 +144,17 @@ function Room({ playerId }) {
     [live, playerId],
   )
   const msgById = useMemo(() => Object.fromEntries(messages.map((m) => [m.id, m])), [messages])
-  const myPicks = picks.filter((k) => k.playerId === playerId)
-  const blocked = replies.filter((r) => r.blocked)
-  const [showBlocked, setShowBlocked] = useState(false)
+  const myPicks = picks.filter((k) => k.playerId === playerId && !k.removed)
 
   // 시간순으로 섞은 대화: 선수 메시지(오른쪽) · 팬 답장(왼쪽) · 공개 픽 대답(오른쪽)
   const timeline = useMemo(() => {
     const items = [
       ...messages.map((m) => ({ kind: 'msg', at: m.createdAt, m })),
-      ...replies.filter((r) => !r.blocked || showBlocked).map((r) => ({ kind: 'reply', at: r.createdAt, r })),
+      ...replies.filter((r) => !r.blocked && !r.removed).map((r) => ({ kind: 'reply', at: r.createdAt, r })),
       ...myPicks.map((k) => ({ kind: 'pick', at: k.createdAt, k })),
     ]
     return items.sort((a, b) => a.at - b.at)
-  }, [messages, replies, myPicks, showBlocked])
+  }, [messages, replies, myPicks])
 
   const [draft, setDraft] = useState('')
   const [target, setTarget] = useState(null) // 공개 픽으로 대답할 답장
@@ -167,6 +165,11 @@ function Room({ playerId }) {
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: 'end' })
   }, [timeline.length])
+
+  // 관리자가 지운 답장을 공개 픽 대상으로 잡고 있었다면 풀어 준다
+  useEffect(() => {
+    if (target && replies.some((r) => r.id === target.id && r.removed)) setTarget(null)
+  }, [replies, target])
 
   useEffect(() => {
     const last = replies.reduce((t, r) => Math.max(t, r.createdAt), 0)
@@ -214,11 +217,6 @@ function Room({ playerId }) {
       </header>
 
       <div className="bk-thread">
-        {blocked.length > 0 && (
-          <button type="button" className="bk-sys" onClick={() => setShowBlocked((v) => !v)}>
-            금칙어로 숨긴 답장 {blocked.length}개 · {showBlocked ? '숨기기' : '보기'}
-          </button>
-        )}
         {timeline.length === 0 && <p className="bk-sys">아직 대화가 없어요. 아래에서 첫 메시지를 보내 보세요.</p>}
 
         {timeline.map((it) => {
@@ -261,7 +259,7 @@ function Room({ playerId }) {
           return (
             <div key={r.id}>
               {sep}
-              <div className={`bk-fan ${r.blocked ? 'blocked' : ''} ${target?.id === r.id ? 'target' : ''}`}>
+              <div className={`bk-fan ${target?.id === r.id ? 'target' : ''}`}>
                 <span className="bk-av">{r.team ? <img src={`logos/${r.team}.jpg`} alt="" /> : <TeamDot teamId={r.team} />}</span>
                 <div>
                   <b className="bk-nick">{r.nickname}</b>
@@ -269,26 +267,24 @@ function Room({ playerId }) {
                     <div className="bk-bub fan">{r.text}</div>
                     <small>{timeLabel(r.createdAt)}</small>
                   </div>
-                  {!r.blocked && (
-                    <div className="bk-acts">
-                      <button type="button" className={r.heart ? 'on' : ''} onClick={() => store?.setHeart(r.id, !r.heart)}>
-                        {r.heart ? '❤️' : '🤍'}
+                  <div className="bk-acts">
+                    <button type="button" className={r.heart ? 'on' : ''} onClick={() => store?.setHeart(r.id, !r.heart)}>
+                      {r.heart ? '❤️' : '🤍'}
+                    </button>
+                    {r.picked ? (
+                      <span className="picked">공개 픽 완료</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTarget(r)
+                          inputRef.current?.focus()
+                        }}
+                      >
+                        공개 픽으로 대답
                       </button>
-                      {r.picked ? (
-                        <span className="picked">공개 픽 완료</span>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setTarget(r)
-                            inputRef.current?.focus()
-                          }}
-                        >
-                          공개 픽으로 대답
-                        </button>
-                      )}
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

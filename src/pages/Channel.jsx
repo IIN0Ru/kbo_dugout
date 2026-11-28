@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { playerById, teamById, SEED_MESSAGES, RESTING } from '../data/teams.js'
 import { useSession, useSub } from '../session.jsx'
 import { PlayerTile, timeLabel, fmt } from '../components/ui.jsx'
-import { isBlocked, REPLY_MAX_LEN, REPLIES_PER_MESSAGE } from '../data/filter.js'
+import { findBadWord, REPLY_MAX_LEN, REPLIES_PER_MESSAGE } from '../data/filter.js'
 
 function readPlan() {
   try {
@@ -29,7 +29,7 @@ export default function Channel() {
   )
   const fans = useSub(store ? (cb) => store.subscribeFanCount(cb) : null, [store], 0)
   const allPicks = useSub(store ? (cb) => store.subscribePicks(cb) : null, [store], [])
-  const picks = useMemo(() => allPicks.filter((k) => k.playerId === playerId), [allPicks, playerId])
+  const picks = useMemo(() => allPicks.filter((k) => k.playerId === playerId && !k.removed), [allPicks, playerId])
 
   const messages = useMemo(
     () => [...SEED_MESSAGES.filter((m) => m.playerId === playerId), ...live].sort((a, b) => a.createdAt - b.createdAt),
@@ -70,6 +70,7 @@ export default function Channel() {
 
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
+  const [warn, setWarn] = useState('')
   const [plan, setPlan] = useState(readPlan)
   const [showInfo, setShowInfo] = useState(true)
   const endRef = useRef(null)
@@ -110,6 +111,11 @@ export default function Channel() {
     e.preventDefault()
     const t = text.trim()
     if (!t || !canReply || sending) return
+    // 1차 필터: 금칙어가 있으면 서버로 보내지 않고 입력창에 그대로 둔다
+    if (findBadWord(t)) {
+      setWarn('쓸 수 없는 말이 들어 있어 보내지 않았어요. 내용을 고쳐 주세요.')
+      return
+    }
     setSending(true)
     try {
       await store.sendReply({
@@ -119,7 +125,6 @@ export default function Channel() {
         nickname: profile.nickname,
         team: profile.team,
         text: t,
-        blocked: isBlocked(t),
       })
       setText('')
     } catch (err) {
@@ -235,9 +240,11 @@ export default function Channel() {
             </div>
             {(byMsg[m.id] || []).map((r) => (
               <div key={r.id} className="mine">
-                <div className={`bub fan ${r.blocked ? 'blocked' : ''}`}>{r.text}</div>
+                <div className={`bub fan ${r.blocked || r.removed ? 'blocked' : ''}`}>{r.text}</div>
                 <div className="state">
-                  {r.blocked ? (
+                  {r.removed ? (
+                    <span className="st-block">운영자가 삭제한 답장이에요 · {r.removedReason || '운영 정책 위반'}</span>
+                  ) : r.blocked ? (
                     <span className="st-block">금칙어가 있어 선수에게 전달되지 않았어요</span>
                   ) : r.picked ? (
                     <span className="st-pick">공개 픽 선정 · 모두에게 공개됐어요</span>
@@ -255,6 +262,11 @@ export default function Channel() {
         <div ref={endRef} />
       </div>
 
+      {warn && (
+        <p className="reply-warn" role="alert">
+          {warn}
+        </p>
+      )}
       <form className="composer" onSubmit={send}>
         {plan !== 'member' ? (
           <div className="locked">
@@ -292,7 +304,10 @@ export default function Channel() {
               id="reply"
               value={text}
               maxLength={REPLY_MAX_LEN}
-              onChange={(e) => setText(e.target.value)}
+              onChange={(e) => {
+                setText(e.target.value)
+                if (warn) setWarn('')
+              }}
               placeholder={`답장 보내기 (${left}번 남음)`}
               autoComplete="off"
               enterKeyHint="send"
