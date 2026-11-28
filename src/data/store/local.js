@@ -2,7 +2,7 @@
 import { LOCAL_BENCH_PASSWORD } from '../config.js'
 
 const KEY = 'dugout-local-db-v1'
-const empty = () => ({ users: {}, messages: [], replies: [], picks: [] })
+const empty = () => ({ users: {}, messages: [], replies: [], picks: [], warnings: [] })
 
 function load() {
   try {
@@ -121,6 +121,33 @@ export const localStore = {
   },
   subscribePicks(cb) {
     return watch((d) => d.picks, cb)
+  },
+  async removeReply(reply, reason, pickIds = []) {
+    const r = db.replies.find((x) => x.id === reply.id)
+    if (r) Object.assign(r, { removed: true, removedReason: reason, removedAt: Date.now() })
+    for (const k of db.picks) if (pickIds.includes(k.id)) k.removed = true
+    db.warnings.push({
+      id: uid(),
+      uid: reply.uid,
+      replyId: reply.id,
+      replyText: reply.text,
+      playerId: reply.playerId,
+      reason,
+      seen: false,
+      createdAt: Date.now(),
+    })
+    commit()
+  },
+  subscribeMyWarnings(userId, cb) {
+    return watch((d) => d.warnings.filter((w) => w.uid === userId), cb)
+  },
+  subscribeAllWarnings(cb) {
+    return watch((d) => d.warnings, cb)
+  },
+  async markWarningSeen(id) {
+    const w = db.warnings.find((x) => x.id === id)
+    if (w) w.seen = true
+    commit()
   },
   async benchLogin(password) {
     return password === LOCAL_BENCH_PASSWORD

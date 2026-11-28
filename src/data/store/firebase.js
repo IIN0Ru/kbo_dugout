@@ -109,6 +109,31 @@ export const firebaseStore = {
   subscribePicks(cb) {
     return listen(collection(fs, 'picks'), cb)
   },
+  // 관리자: 답장 삭제(내용은 기록으로 남기고 화면에서 숨김) + 공개 픽 내리기 + 작성자에게 경고
+  async removeReply(reply, reason, pickIds = []) {
+    const batch = writeBatch(fs)
+    batch.update(doc(fs, 'replies', reply.id), { removed: true, removedReason: reason, removedAt: serverTimestamp() })
+    for (const id of pickIds) batch.update(doc(fs, 'picks', id), { removed: true })
+    batch.set(doc(collection(fs, 'warnings')), {
+      uid: reply.uid,
+      replyId: reply.id,
+      replyText: reply.text,
+      playerId: reply.playerId,
+      reason,
+      seen: false,
+      createdAt: serverTimestamp(),
+    })
+    await batch.commit()
+  },
+  subscribeMyWarnings(userId, cb) {
+    return listen(query(collection(fs, 'warnings'), where('uid', '==', userId)), cb)
+  },
+  subscribeAllWarnings(cb) {
+    return listen(collection(fs, 'warnings'), cb)
+  },
+  async markWarningSeen(id) {
+    await updateDoc(doc(fs, 'warnings', id), { seen: true })
+  },
   async benchLogin(password) {
     try {
       await signInWithEmailAndPassword(auth, BENCH_EMAIL, password)

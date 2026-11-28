@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom'
 export default function Picks() {
   const { store } = useSession()
   const picks = useSub(store ? (cb) => store.subscribePicks(cb) : null, [store], [])
-  const list = [...picks].sort((a, b) => b.createdAt - a.createdAt)
+  const list = picks.filter((k) => !k.removed).sort((a, b) => b.createdAt - a.createdAt)
 
   if (!list.length) {
     return (

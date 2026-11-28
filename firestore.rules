@@ -2,7 +2,9 @@ rules_version = '2';
 // DUGOUT 시연용 Firestore 보안 규칙
 // - 모두 익명 로그인. 발표자 화면(#/bench)은 외부에 공개하지 않는 시연용이라 따로 로그인하지 않는다.
 // - 그래서 로그인한 사람이면 선수 메시지 발송, 답장 읽기, ❤️·공개 픽이 가능하다.
-// - 답장은 자기 이름(uid)으로만 쓰고, 이미 쓴 답장은 ❤️·공개 픽 표시만 바꿀 수 있다.
+// - 답장은 자기 이름(uid)으로만 쓰고, 이미 쓴 답장은 ❤️·공개 픽·관리자 삭제 표시만 바꿀 수 있다.
+// - 금칙어는 보내기 전에 앱에서 막는다. 필터를 피한 답장은 발표자 화면(#/bench)의 '답장 관리' 탭에서 삭제 표시 + 경고를 남긴다.
+// - 답장 관리도 발표자 화면 안에 있어 숨은 주소만 쓰는 시연용이다. 실서비스라면 관리자 계정(custom claim)으로 제한해야 한다.
 service cloud.firestore {
   match /databases/{database}/documents {
     function signedIn() { return request.auth != null; }
@@ -34,14 +36,30 @@ service cloud.firestore {
         && request.resource.data.heart == false
         && request.resource.data.picked == false;
       allow update: if signedIn()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['heart', 'picked']);
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['heart', 'picked', 'removed', 'removedReason', 'removedAt']);
       allow delete: if false;
     }
 
     match /picks/{id} {
       allow read: if signedIn();
       allow create: if signedIn();
-      allow update, delete: if false;
+      // 관리자가 삭제한 답장의 공개 픽을 내릴 때만 바꿀 수 있다
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['removed']);
+      allow delete: if false;
+    }
+
+    // 관리자 경고. 받은 사람만 '확인함(seen)'으로 바꿀 수 있다.
+    match /warnings/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.uid is string
+        && request.resource.data.reason is string
+        && request.resource.data.seen == false;
+      allow update: if signedIn()
+        && resource.data.uid == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['seen']);
+      allow delete: if false;
     }
   }
 }

@@ -7,6 +7,7 @@ import Home from './pages/Home.jsx'
 import Channel from './pages/Channel.jsx'
 import Bench from './pages/Bench.jsx'
 import Me from './pages/Me.jsx'
+import WarningModal from './components/WarningModal.jsx'
 
 function ErrorBar() {
   const { error, store } = useSession()
@@ -33,6 +34,7 @@ export default function App() {
             <Route path="/me" element={<Me />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
+          <WarningModal />
         </div>
       </HashRouter>
     </SessionProvider>
