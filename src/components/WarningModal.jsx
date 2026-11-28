@@ -6,7 +6,7 @@ import { playerById } from '../data/teams.js'
 export default function WarningModal() {
   const { store, uid, profile } = useSession()
   const { pathname } = useLocation()
-  const staff = pathname.startsWith('/bench') || pathname.startsWith('/admin')
+  const staff = pathname.startsWith('/bench')
   const mine = useSub(
     store && uid && !staff ? (cb) => store.subscribeMyWarnings(uid, cb) : null,
     [store, uid, staff],

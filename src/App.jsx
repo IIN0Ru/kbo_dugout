@@ -7,7 +7,6 @@ import Home from './pages/Home.jsx'
 import Channel from './pages/Channel.jsx'
 import Bench from './pages/Bench.jsx'
 import Me from './pages/Me.jsx'
-import Admin from './pages/Admin.jsx'
 import WarningModal from './components/WarningModal.jsx'
 
 function ErrorBar() {
@@ -33,7 +32,6 @@ export default function App() {
             <Route path="/bench" element={<Bench />} />
             <Route path="/bench/:playerId" element={<Bench />} />
             <Route path="/me" element={<Me />} />
-            <Route path="/admin" element={<Admin />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
           <WarningModal />

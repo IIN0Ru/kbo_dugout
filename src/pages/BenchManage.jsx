@@ -1,12 +1,12 @@
 import { useMemo, useState } from 'react'
 import { playerById, teamById } from '../data/teams.js'
 import { useSession, useSub } from '../session.jsx'
-import { Logo, TeamDot, timeLabel } from '../components/ui.jsx'
+import { TeamDot, timeLabel } from '../components/ui.jsx'
 import { REMOVE_REASONS } from '../data/filter.js'
 
-// 관리자 화면 (숨은 주소 #/admin). 금칙어 필터를 피해 간 답장을 사람이 보고 지운다.
-// 삭제하면: 선수 화면에서 사라지고, 공개 픽이었다면 내려가고, 작성자에게 경고 창이 뜬다.
-export default function Admin() {
+// 발표자 화면(#/bench)의 '답장 관리' 탭. 금칙어 필터를 피해 간 답장을 사람이 보고 지운다.
+// 삭제하면: 선수 채팅방에서 사라지고, 공개 픽이었다면 내려가고, 작성자에게 경고 창이 뜬다.
+export default function AdminPanel() {
   const { store } = useSession()
   const replies = useSub(store ? (cb) => store.subscribeAllReplies(cb) : null, [store], [])
   const picks = useSub(store ? (cb) => store.subscribePicks(cb) : null, [store], [])
@@ -51,12 +51,7 @@ export default function Admin() {
   }
 
   return (
-    <main className="page lt bk adm">
-      <header className="bk-top">
-        <Logo size={18} />
-        <span className="bench-tag adm-tag">관리자</span>
-      </header>
-      <h1 className="bk-title">답장 관리</h1>
+    <section className="adm">
       <p className="adm-lead">
         금칙어 필터를 피해 간 답장을 직접 지울 수 있어요. 지우면 선수 화면에서 사라지고 작성자에게 경고가 가요.
       </p>
@@ -144,6 +139,6 @@ export default function Admin() {
           )
         })}
       </ul>
-    </main>
+    </section>
   )
 }

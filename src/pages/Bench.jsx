@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { PLAYERS, playerById, teamById, SEED_MESSAGES, RESTING } from '../data/teams.js'
 import { useSession, useSub } from '../session.jsx'
 import { Logo, PlayerTile, TeamDot, timeLabel, fmt } from '../components/ui.jsx'
+import AdminPanel from './BenchManage.jsx'
 
 // 발표자용 선수 화면 (숨은 주소 #/bench). 카카오톡처럼 채팅 목록 → 채팅방.
 // 외부에 공개하지 않는 시연용이라 로그인 없이 바로 쓴다.
@@ -26,7 +27,33 @@ const writeSeen = (playerId, at) => {
 
 export default function Bench() {
   const { playerId } = useParams()
-  return playerId && playerById(playerId) ? <Room playerId={playerId} /> : <ChatList />
+  const [params, setParams] = useSearchParams()
+  if (playerId && playerById(playerId)) return <Room playerId={playerId} />
+  const tab = params.get('tab') === 'manage' ? 'manage' : 'chat'
+
+  return (
+    <main className="page lt bk">
+      <header className="bk-top">
+        <Logo size={18} />
+        <span className="bench-tag">선수 화면 · 발표자</span>
+      </header>
+      <nav className="bk-tabs" role="tablist">
+        <button type="button" role="tab" aria-selected={tab === 'chat'} className={tab === 'chat' ? 'on' : ''} onClick={() => setParams({})}>
+          채팅
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === 'manage'}
+          className={tab === 'manage' ? 'on' : ''}
+          onClick={() => setParams({ tab: 'manage' })}
+        >
+          답장 관리
+        </button>
+      </nav>
+      {tab === 'manage' ? <AdminPanel /> : <ChatList />}
+    </main>
+  )
 }
 
 /* ---------- 채팅 목록 ---------- */
@@ -64,14 +91,8 @@ function ChatList() {
   const totalUnread = rooms.reduce((n, r) => n + r.unread, 0)
 
   return (
-    <main className="page lt bk">
-      <header className="bk-top">
-        <Logo size={18} />
-        <span className="bench-tag">선수 화면 · 발표자</span>
-      </header>
-      <h1 className="bk-title">
-        채팅{totalUnread > 0 && <em>{totalUnread}</em>}
-      </h1>
+    <>
+      {totalUnread > 0 && <p className="bk-unread">안 읽은 답장 {totalUnread > 99 ? '99+' : totalUnread}개</p>}
 
       {rooms.length === 0 && (
         <div className="bk-empty">
@@ -123,7 +144,7 @@ function ChatList() {
           ))}
         </ul>
       )}
-    </main>
+    </>
   )
 }
 
